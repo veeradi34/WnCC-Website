@@ -1,0 +1,3672 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+import { 
+  Code, 
+  Laptop,
+  Cpu,
+  GitBranch,
+  Trophy,
+  Star,
+  Sparkles,
+  Users,
+  Calendar,
+  Lightbulb,
+  BookOpen,
+  UserCheck,
+  MessageCircle,
+  Github,
+  Twitter,
+  Linkedin,
+  Activity,
+  Instagram,
+  Award,
+  Zap,
+  Brain,
+  Globe,
+  MousePointer,
+  Sparkles as SparklesIcon,
+  X,
+  Search,
+  Newspaper,
+  ArrowRight,
+  Braces,
+  Lock
+} from 'lucide-react';
+
+
+// Card component for consistent styling
+const Card = ({ children, className = "", onMouseEnter, onMouseLeave }) => (
+  <div 
+    className={`bg-gray-800/50 backdrop-blur p-6 rounded-xl border border-cyan-500/20 transition-all duration-300 hover:shadow-lg hover:border-cyan-500/40 ${className}`}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
+    {children}
+  </div>
+);
+const generateCalendarUrl = (event) => {
+  const encodedText = encodeURIComponent(event.title);
+  const encodedDetails = encodeURIComponent(event.description);
+  const encodedLocation = encodeURIComponent(event.location);
+  const startDate = new Date(event.date).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  const endDate = new Date(event.endDate).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  
+  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodedText}&details=${encodedDetails}&location=${encodedLocation}&dates=${startDate}/${endDate}`;
+};
+const TechNewsFeed = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const news = [
+    {
+      title: "New AI Research Lab Launch",
+      date: "2 hours ago",
+      category: "Research",
+      description: "Exploring the frontiers of artificial intelligence and machine learning."
+    },
+    {
+      title: "Open Source Sprint Success",
+      date: "1 day ago",
+      category: "Development",
+      description: "Students contributed to major open source projects during the weekend sprint."
+    },
+    {
+      title: "Coding Competition Results",
+      date: "3 days ago",
+      category: "Competition",
+      description: "Team Alpha secured first place in the national coding championship."
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % news.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <Card>
+      <h3 className="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+        <Newspaper className="w-5 h-5" />
+        Tech News Feed
+      </h3>
+      <div className="relative overflow-hidden h-48">
+        {news.map((item, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transform transition-all duration-500 ${
+              index === activeIndex 
+                ? 'translate-x-0 opacity-100' 
+                : 'translate-x-full opacity-0'
+            }`}
+          >
+            <span className="bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded text-sm">
+              {item.category}
+            </span>
+            <h4 className="text-lg font-semibold text-white mt-2 mb-1">{item.title}</h4>
+            <p className="text-gray-400 text-sm mb-2">{item.date}</p>
+            <p className="text-gray-300">{item.description}</p>
+            <button className="mt-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+              Read More <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-2 mt-4">
+        {news.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === activeIndex 
+                ? 'bg-cyan-400 w-4' 
+                : 'bg-gray-600 hover:bg-gray-500'
+            }`}
+          />
+        ))}
+      </div>
+    </Card>
+  );
+};
+const ParticleEffect = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.speed = 0.5;
+        this.size = Math.random() * 2;
+      }
+
+      update() {
+        this.y -= this.speed;
+        if (this.y < 0) {
+          this.y = canvas.height;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = 'rgba(103, 232, 249, 0.5)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 100; i++) {
+      particles.push(new Particle());
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+    />
+  );
+};
+
+// Stats component for HomePage
+const StatsCounter = ({ label, endValue, duration = 2000 }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime;
+    let animationFrame;
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = (currentTime - startTime) / duration;
+
+      if (progress < 1) {
+        setCount(Math.floor(endValue * progress));
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(endValue);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [endValue, duration]);
+
+  return (
+    <div className="text-center p-4">
+      <div className="text-4xl font-bold text-cyan-400 mb-2">{count}+</div>
+      <div className="text-gray-300">{label}</div>
+    </div>
+  );
+};
+const LiveCodeEditor = () => {
+  const [code, setCode] = useState('// Try this:\nconsole.log("Hello WnCC!");');
+  const [output, setOutput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const simulateCodeExecution = () => {
+    setIsLoading(true);
+    setOutput('');
+    
+    const lines = [];
+    setTimeout(() => {
+      try {
+        // Simulate safe code execution with predefined responses
+        if (code.includes('console.log')) {
+          const match = code.match(/console\.log\(['"](.*)['"]\)/);
+          if (match) lines.push(`> ${match[1]}`);
+        }
+        if (code.includes('for')) lines.push('> Loop detected! 🔄');
+        if (code.includes('function')) lines.push('> Function defined! 🎯');
+        if (code.includes('if')) lines.push('> Conditional logic found! 🤔');
+        
+        setOutput(lines.join('\n') || '> Code executed successfully! ✨');
+      } catch (err) {
+        setOutput('Error: ' + err.message);
+      }
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-cyan-400">Live Code Editor</h3>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setCode('// Fresh start!')}
+            className="px-3 py-1 bg-gray-700 rounded text-sm"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        className="w-full bg-gray-900 text-cyan-400 font-mono p-4 rounded mb-4 h-32 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        spellCheck="false"
+      />
+      <button 
+        onClick={simulateCodeExecution}
+        disabled={isLoading}
+        className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50"
+      >
+        {isLoading ? 'Running...' : 'Run Code ▶'}
+      </button>
+      {output && (
+        <div className="mt-4 p-4 bg-gray-900 rounded font-mono">
+          <pre className="text-green-400 whitespace-pre-wrap">{output}</pre>
+        </div>
+      )}
+    </Card>
+  );
+};
+// Activity Feed component for HomePage
+const ActivityFeed = () => {
+  const activities = [
+    { text: "Succesful Completion of Hello-FOSS 2024", time: "2 days ago" },
+    { text: "Hackathon registration opened", time: "5 hours ago" },
+    { text: "Workshop materials updated", time: "1 day ago" }
+  ];
+
+  return (
+    <div className="bg-gray-800/50 p-4 rounded-xl">
+      <h3 className="text-xl font-bold text-cyan-400 mb-4">Recent Activity</h3>
+      {activities.map((activity, index) => (
+        <div key={index} className="flex items-center gap-3 mb-3 p-2 hover:bg-gray-700/30 rounded">
+          <Activity className="text-cyan-400 w-4 h-4" />
+          <div>
+            <p className="text-white">{activity.text}</p>
+            <p className="text-gray-400 text-sm">{activity.time}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// RiddleGame Component
+const RiddleGame = () => {
+  const riddles = [
+    {
+      question: "In a room of 23 people, what's the probability that at least two people share the same birthday? (Answer in percentage, rounded to nearest whole number)",
+      answer: "51"
+    },
+    {
+      question: "You have 8 identical balls, but 1 is slightly heavier. Using a balance scale, what's the minimum number of weighings needed to find the heavier ball?",
+      answer: "2"
+    },
+    {
+      question: "100 people standing in a circle in an order from 1 to 100. Person 1 has a sword. He kills the next person (2) and gives the sword to the next living person (3). All people do the same until only one survives. Which number lives?",
+      answer: "73"
+    },
+    {
+      question: "A snail climbs up a 10-foot wall. Each day it climbs up 3 feet, but slides down 2 feet at night. How many days will it take the snail to reach the top?",
+      answer: "8"
+    },
+    {
+      question: "You have a 5-liter jug and a 3-liter jug. How can you measure exactly 4 liters? Enter the number of steps required.",
+      answer: "6"
+    },
+    {
+      question: "In binary representation, how many numbers from 1 to 20 (inclusive) have exactly two 1's in their binary form?",
+      answer: "6"
+    },
+    {
+      question: "A message is encoded by shifting each letter by its position (1st letter shifted by 1, 2nd by 2, etc). 'HAL' becomes 'IBM'. What does 'BUG' become?",
+      answer: "DIJ"
+    },
+    {
+      question: "On a 3x3 grid, how many unique paths are there from top-left to bottom-right if you can only move right or down?",
+      answer: "6"
+    },
+    {
+      question: "In an array of integers from 1 to n, one number appears twice while one number is missing. If array sum is 55 and n is 10, what's the duplicate number?",
+      answer: "7"
+    },
+    {
+      question: "Given a fair coin, what's the expected number of flips needed to get two consecutive heads? (Round to one decimal place)",
+      answer: "6"
+    },
+    {
+      question: "How many trailing zeros are in 100 factorial (100!)?",
+      answer: "24"
+    },
+    {
+      question: "What's the maximum number of pieces you can get by cutting a circular pizza with 6 straight cuts?",
+      answer: "22"
+    },
+    {
+      question: "If you have 9 coins and one is counterfeit (lighter), minimum number of weighings on a balance scale to find it?",
+      answer: "2"
+    },
+    {
+      question: "How many different ways can you make change for $1 using standard US coins (1,5,10,25,50 cents)?",
+      answer: "292"
+    },
+    {
+      question: "In a sorted array of n distinct integers, if array[index] = index for some index, this index is called a magic index. For array [-5,-3,0,3,7], what's the magic index?",
+      answer: "3"
+    }
+  ];
+
+  const [currentRiddle, setCurrentRiddle] = useState(riddles[0]);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [streak, setStreak] = useState(0);
+  const [usedRiddles, setUsedRiddles] = useState(new Set([0]));
+  const [showHint, setShowHint] = useState(false);
+
+  const getNextRiddle = () => {
+    let availableIndices = Array.from({ length: riddles.length }, (_, i) => i)
+      .filter(i => !usedRiddles.has(i));
+    
+    if (availableIndices.length === 0) {
+      setUsedRiddles(new Set([0]));
+      availableIndices = Array.from({ length: riddles.length }, (_, i) => i);
+    }
+
+    const nextIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    setCurrentRiddle(riddles[nextIndex]);
+    setUsedRiddles(prev => new Set([...prev, nextIndex]));
+    setShowHint(false);
+  };
+
+  const checkAnswer = () => {
+    if (userAnswer.toLowerCase().trim() === currentRiddle.answer.toLowerCase()) {
+      setStreak(prev => prev + 1);
+      setFeedback('Correct! 🎉 Get ready for the next question...');
+      setUserAnswer('');
+      setShowHint(false);
+      setTimeout(() => {
+        setFeedback('');
+        getNextRiddle();
+      }, 2000);
+    } else {
+      setFeedback('Incorrect! Try again 💡');
+      setStreak(0);
+    }
+  };
+
+  return (
+    <Card className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-cyan-400">Coding Interview Practice</h3>
+        <div className="flex gap-4 items-center">
+          <span className="bg-cyan-500/20 px-3 py-1 rounded-full text-cyan-400">
+            Streak: {streak} 🔥
+          </span>
+          <button
+            onClick={() => {
+              setStreak(0);
+              setUserAnswer('');
+              setFeedback('');
+              setShowHint(false);
+              getNextRiddle();
+            }}
+            className="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded-full transition-colors"
+          >
+            Skip
+          </button>
+        </div>
+      </div>
+      <div className="bg-gray-800 p-4 rounded-lg mb-6">
+        <p className="text-lg text-gray-200">{currentRiddle.question}</p>
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={userAnswer}
+          onChange={(e) => setUserAnswer(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
+          className="flex-1 bg-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          placeholder="Your answer..."
+        />
+        <button
+          onClick={checkAnswer}
+          className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
+        >
+          Submit
+        </button>
+      </div>
+      {feedback && (
+        <div className={`mt-4 text-center ${feedback.includes('Correct') ? 'text-green-400' : 'text-cyan-400'}`}>
+          {feedback}
+        </div>
+      )}
+    </Card>
+  );
+};
+const FeatureCard = ({ icon: Icon, title, description }) => (
+  <Card className="text-center">
+    <Icon className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+    <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+    <p className="text-gray-300">{description}</p>
+  </Card>
+);
+
+// About Us Section
+const AboutUs = () => (
+  <div className="mt-20 relative">
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/50 pointer-events-none" />
+    <h2 className="text-4xl font-bold text-center text-cyan-400 mb-8">About Us</h2>
+    <div className="grid md:grid-cols-3 gap-8">
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Mission</h3>
+        <p className="text-gray-300">
+        We aim to foster a culture of learning and innovation by empowering students with the skills to excel in web development, competitive coding, open-source contributions, and emerging technologies.
+        </p>
+      </Card>
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Vision</h3>
+        <p className="text-gray-300">
+        Create an inclusive environment where students collaborate, innovate, and grow together as problem-solvers and developers.
+        </p>
+      </Card>
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Values</h3>
+        <p className="text-gray-300">
+          Innovation, collaboration, excellence, and continuous learning.
+        </p>
+      </Card>
+    </div>
+  </div>
+);
+
+const HomePage = () => {
+  const [typewriterText, setTypewriterText] = useState('');
+  const fullText = "Coders Together Strong";
+  
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      setTypewriterText(fullText.substring(0, index));
+      index++;
+      if (index > fullText.length) {
+        setTimeout(() => {
+          index = 0;
+        }, 2000);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+  const features = [
+    {
+      icon: Brain,
+      title: "Fast Paced-Courses",
+      description: "Deep dive into topics like machine learning, Web Development, and more"
+    },
+    {
+      icon: Globe,
+      title: "Hackathons",
+      description: "Compete with like minded-developers"
+    },
+    {
+      icon: Zap,
+      title: "Expert Talk Sessions",
+      description: "Quick, intensive tech sessions"
+    }
+  ];
+  return (
+    <div className="space-y-12 relative">
+      <ParticleEffect />
+      
+      <div className="text-center relative">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/20 rounded-full filter blur-3xl" />
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/20 rounded-full filter blur-3xl" />
+        <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
+          WnCC IIT Bombay
+        </h1>
+        <div className="h-8">
+          <span className="font-mono text-2xl text-cyan-400">
+            {typewriterText}
+            <span className="animate-pulse">_</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-4 gap-6">
+        <StatsCounter label="Active Members" endValue={500} />
+        <StatsCounter label="Projects" endValue={150} />
+        <StatsCounter label="Events" endValue={50} />
+        <StatsCounter label="Awards" endValue={25} />
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {features.map((feature, index) => (
+          <FeatureCard key={index} {...feature} />
+        ))}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <LiveCodeEditor />
+          <ActivityFeed />
+        </div>
+        <div className="space-y-8">
+          <RiddleGame />
+          <TechNewsFeed />
+          
+        </div>
+      </div>
+
+      <AboutUs />
+    </div>
+  );
+};
+const EventCard = ({ event }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const timeUntilEvent = () => {
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    const diff = eventDate - now;
+    
+    if (diff < 0) return 'Event has passed';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    return `${days}d ${hours}h remaining`;
+  };
+
+  return (
+    <Card 
+      className="transform transition-all duration-500 hover:scale-105"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative overflow-hidden rounded-t-xl -mt-6 -mx-6 mb-6">
+        <div className="h-48 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+          {event.icon}
+          {isHovered && (
+            <div className="absolute inset-0 bg-cyan-500/10 backdrop-blur-sm flex items-center justify-center">
+              <button className="bg-cyan-500 text-white px-6 py-2 rounded-full transform hover:scale-105 transition-transform">
+                Register Now
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="absolute top-4 right-4 bg-cyan-500/90 text-white px-3 py-1 rounded-full text-sm">
+          {timeUntilEvent()}
+        </div>
+      </div>
+      
+      <h3 className="text-2xl font-semibold text-white mb-2">{event.title}</h3>
+      <div className="flex items-center gap-2 text-cyan-300 mb-2">
+        <Calendar className="w-4 h-4" />
+        {new Date(event.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric'
+        })}
+      </div>
+      <p className="text-gray-300 mb-4">{event.description}</p>
+      
+      <div className="flex items-center gap-4 mb-4">
+        <span className="text-gray-400 flex items-center gap-1">
+          <Users className="w-4 h-4" />
+          {event.participants || '150+'} registered
+        </span>
+        <span className="text-gray-400 flex items-center gap-1">
+          <Trophy className="w-4 h-4" />
+          {event.prize || '$1000'} in prizes
+        </span>
+      </div>
+      
+      <div className="flex gap-2">
+        <a
+          href={generateCalendarUrl(event)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 rounded-lg hover:bg-cyan-500/30 transition-colors text-cyan-400"
+        >
+          <Calendar className="w-4 h-4" />
+          Add to Calendar
+        </a>
+        <button className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors ml-auto">
+          Learn More
+        </button>
+      </div>
+    </Card>
+  );
+};
+
+
+// Timeline component for EventsPage
+const EventTimeline = () => {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  
+  const timelineItems = [
+    {
+      title: "Season Kickoff",
+      date: "January 2024",
+      description: "New season begins with 101 sessions",
+      icon: <Star className="w-6 h-6" />,
+      color: "from-green-500 to-emerald-700"
+    },
+    {
+      title: "GC Week",
+      date: "Jan End to Feb Mid 2024",
+      description: "2 Week-long 2 GCs-long",
+      icon: <Cpu className="w-6 h-6" />,
+      color: "from-blue-500 to-indigo-700"
+    },
+    {
+      title: "Codewars",
+      date: "March 2024",
+      description: "10 days coding/strategy wars. Flagship event for Freshers",
+      icon: <Code className="w-6 h-6" />,
+      color: "from-purple-500 to-pink-700"
+    }
+  ];
+
+  return (
+    <div className="relative mt-20">
+      <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-cyan-500/50 to-transparent" />
+      {timelineItems.map((item, index) => (
+        <div 
+          key={index}
+          className={`relative flex items-center mb-12 ${
+            index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
+          }`}
+          onMouseEnter={() => setSelectedEvent(index)}
+          onMouseLeave={() => setSelectedEvent(null)}
+        >
+          <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}>
+            <div 
+              className={`p-6 rounded-xl bg-gradient-to-br ${item.color} transform transition-all duration-300 ${
+                selectedEvent === index ? 'scale-105' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-2 justify-end">
+                {item.icon}
+                <h3 className="text-xl font-bold text-white">{item.title}</h3>
+              </div>
+              <p className="text-gray-200">{item.date}</p>
+              <p className="text-gray-100 mt-2">{item.description}</p>
+            </div>
+          </div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+            <div className={`w-4 h-4 rounded-full bg-cyan-400 transition-transform duration-300 ${
+              selectedEvent === index ? 'scale-150' : ''
+            }`} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
+const EventsPage = () => {
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  
+  const events = [
+    {
+      title: 'Algo GC',
+      date: '2025-01-28T20:00:00Z',
+      endDate: '2025-01-10T20:30:00Z',
+      description: 'Annual Algo General Championship, part of Tech GC.',
+      location: 'IIT Bombay Campus',
+      icon: <Calendar className="w-16 h-16 text-cyan-400" />,
+      category: 'competition',
+      participants: '',
+      prize: 'GC Points'
+    },
+    {
+      title: 'Machine Learning GC',
+      date: '2025-02-10T20:00:00Z',
+      endDate: '2025-02-10T20:00:00Z',
+      description: 'Annual ML General Championship, part of Tech GC.',
+      location: 'IIT Bombay Campus',
+      icon: <Laptop className="w-16 h-16 text-cyan-400" />,
+      category: 'competition',
+      participants: '',
+      prize: 'GC Points'
+    },
+    {
+      title: 'Codewars',
+      date: '2025-03-10T00:00:00Z',
+      endDate: '2025-04-20T00:00:00Z',
+      description: 'Our flagship event for freshers. A strategy and coding competition.',
+      location: 'IIT Bombay Campus',
+      icon: <Lightbulb className="w-16 h-16 text-cyan-400" />,
+      category: 'competition',
+      participants: '',
+      prize: 'Cash Prize'
+    }
+  ];
+
+  const filteredEvents = selectedFilter === 'all' 
+    ? events 
+    : events.filter(event => event.category === selectedFilter);
+
+  return (
+    <div className="space-y-12 relative">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl" />
+      
+      {/* Hero section */}
+      <div className="text-center relative">
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text mb-6">
+          Upcoming Events
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Join us for exciting workshops, competitions, and learning experiences
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex justify-center gap-4">
+        {['all', 'competition', 'workshop', 'seminar'].map(filter => (
+          <button
+            key={filter}
+            onClick={() => setSelectedFilter(filter)}
+            className={`px-6 py-2 rounded-full transition-all duration-300 ${
+              selectedFilter === filter
+                ? 'bg-cyan-500 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Events grid */}
+      <div className="grid md:grid-cols-3 gap-8">
+        {filteredEvents.map((event, index) => (
+          <EventCard key={index} event={event} />
+        ))}
+      </div>
+      
+      {/* Timeline section */}
+      <div className="mt-20">
+        <h3 className="text-3xl font-bold text-center text-cyan-400 mb-12">
+          Event Timeline
+        </h3>
+        <EventTimeline />
+      </div>
+    </div>
+  );
+};
+const ResourcesPage = () => {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const categories = [
+    { id: 'all', name: 'ALL_RESOURCES', icon: BookOpen },
+    { id: 'tutorials', name: 'TUTORIALS.exe', icon: Code },
+    { id: 'courses', name: 'COURSES.sys', icon: Laptop },
+    { id: 'projects', name: 'PROJECTS.bin', icon: GitBranch }
+  ];
+
+  const resources = [
+    {
+      title: 'Getting Started with Webdev',
+      category: 'tutorials',
+      difficulty: 'LEVEL::INTERMEDIATE',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Code className="w-8 h-8" />,
+      color: 'from-purple-500 to-pink-500',
+      description: '> Frontend Development\n> React Architecture\n> UI/UX Engineering',
+      tags: ['react', 'javascript', 'frontend'],
+      metrics: {
+        views: 1200,
+        likes: 345
+      },
+      link: 'https://github.com/wncc/Web-Development-LS-24'
+    },
+    {
+      title: 'Data Structures and Algorithms',
+      category: 'courses',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '20 hours',
+      author: 'WnCC Team',
+      icon: <Brain className="w-8 h-8" />,
+      color: 'from-cyan-500 to-blue-500',
+      description: '> Algorithm Design\n> Data Structures\n> Problem Solving',
+      tags: ['algorithms', 'complexity', 'optimization'],
+      metrics: {
+        views: 800,
+        likes: 230
+      },
+      link: 'https://github.com/wncc/DSA-LS-24'
+    },
+    {
+      title: 'Machine Learning Projects',
+      category: 'projects',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '15 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-green-500 to-emerald-500',
+      description: '> Neural Networks\n> Deep Learning\n> Data Science',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Machine-Learning-LS-24'
+    },
+    {
+      title: 'GANs and Diffusion Models',
+      category: 'projects',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-orange-500 to-red-500',
+      description: '> Generative AI\n> Deep Learning\n> Computer Vision',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Hello-FOSS-ML-Diffusivity'
+    },
+    {
+      title: 'Parallel Programming',
+      category: 'projects',
+      difficulty: 'LEVEL::INTERMEDIATE',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-blue-500 to-violet-500',
+      description: '> Multi-threading\n> Parallel Algorithms\n> Performance Optimization',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Hello-Foss-PyThread.cpp'
+    }
+  ];
+
+  const ResourceCard = ({ resource }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+      <Card 
+        className="group relative bg-gray-900/50 backdrop-blur-xl border border-gray-800 overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className={`absolute inset-0 bg-gradient-to-r ${resource.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
+        
+        {/* Cyberpunk-style corner decorations */}
+        <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute top-0 right-0 w-24 h-1 bg-gradient-to-r ${resource.color}`} />
+          <div className={`absolute top-0 right-0 w-1 h-24 bg-gradient-to-b ${resource.color}`} />
+        </div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r ${resource.color}`} />
+          <div className={`absolute bottom-0 left-0 w-1 h-24 bg-gradient-to-b ${resource.color}`} />
+        </div>
+
+        <div className="relative p-6 space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className={`p-3 rounded-xl bg-gradient-to-r ${resource.color}`}>
+              {resource.icon}
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <span className="font-mono text-sm text-gray-500">
+                {resource.difficulty}
+              </span>
+              <span className="font-mono text-sm text-gray-500">
+                DURATION::{resource.duration}
+              </span>
+            </div>
+          </div>
+
+          {/* Title with tech decoration */}
+          <div className="relative">
+            <h3 className={`text-2xl font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+              {resource.title}
+            </h3>
+            <div className="absolute -left-2 top-1/2 w-1 h-6 -translate-y-1/2 bg-gradient-to-b from-transparent via-cyan-500 to-transparent" />
+          </div>
+
+          {/* Author */}
+          <div className="font-mono text-gray-400 text-sm">
+            AUTHOR::{resource.author}
+          </div>
+
+          {/* Description with terminal style */}
+          <div className="font-mono text-sm text-gray-400 space-y-1">
+            {resource.description.split('\n').map((line, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="text-cyan-500">{line}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {resource.tags.map((tag, index) => (
+              <span
+                key={index}
+                className={`px-3 py-1 rounded-full bg-gradient-to-r ${resource.color} bg-opacity-10 
+                           text-white text-sm font-mono flex items-center gap-2`}
+              >
+                <Braces className="w-3 h-3" />
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Metrics */}
+          <div className="grid grid-cols-2 gap-4 font-mono text-sm">
+            <div className="text-center">
+              <div className="text-gray-500">VIEWS</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+                {resource.metrics.views}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-gray-500">LIKES</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+                {resource.metrics.likes}
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            onClick={() => window.open(resource.link, '_blank')}
+            className={`w-full py-2 rounded-lg bg-gradient-to-r ${resource.color} text-white 
+                       font-mono flex items-center justify-center gap-2 transition-transform
+                       hover:scale-[1.02] active:scale-[0.98]`}
+          >
+            <Github className="w-4 h-4" />
+            INITIALIZE_PROJECT
+          </button>
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 relative">
+      {/* Animated circuit-like background */}
+      <div className="fixed inset-0 overflow-hidden opacity-20">
+        <div className="absolute w-full h-full">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-cyan-500"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: '1px',
+                height: `${Math.random() * 100}px`,
+                opacity: Math.random() * 0.5
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Header with cyberpunk styling */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10" />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
+                WnCC::RESOURCES_v2.4
+              </h1>
+              <div className="font-mono text-gray-500 flex items-center gap-4">
+                <span>SYS::ACTIVE</span>
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                <span>{currentTime.toLocaleTimeString()}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 font-mono text-sm">
+              <div className="flex items-center gap-2 text-cyan-500">
+                <Activity className="w-4 h-4" />
+                <span>SYSTEM_ONLINE</span>
+              </div>
+              <div className="flex items-center gap-2 text-purple-500">
+                <Lock className="w-4 h-4" />
+                <span>SECURE_CONNECTION</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and filters */}
+          <div className="flex gap-4 mb-8">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="SEARCH_RESOURCES::"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-900/50 border border-gray-800 rounded-lg px-4 py-3 pl-12 
+                         text-white focus:outline-none focus:border-cyan-500 font-mono"
+              />
+              <Search className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
+            </div>
+            <div className="flex gap-2">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-4 py-2 rounded-lg font-mono flex items-center gap-2 transition-colors
+                             ${activeCategory === category.id
+                               ? 'bg-cyan-500 text-white'
+                               : 'bg-gray-900/50 text-gray-400 hover:bg-gray-800'}`}
+                >
+                  <category.icon className="w-4 h-4" />
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Resources grid */}
+      <div className="container mx-auto px-4 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          {resources
+            .filter(resource => 
+              (activeCategory === 'all' || resource.category === activeCategory) &&
+              (searchQuery === '' || 
+               resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               resource.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+            )
+            .map((resource, index) => (
+              <ResourceCard key={index} resource={resource} />
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+const TeamPage = () => {
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [expandedCards, setExpandedCards] = useState({});
+  const [typingText, setTypingText] = useState({});
+
+  const teamMembers = [
+    {
+      name: 'Divyanshu Suman',
+      role: 'Manager',
+      icon: <UserCheck className="w-12 h-12 text-cyan-400" />,
+      bio: 'PhD in Computer Science with expertise in AI and ML. Leading technical initiatives and mentoring team members.',
+      skills: ['AI/ML', 'System Architecture', 'Team Leadership'],
+      achievements: ['Best Paper Award 2023', 'Tech Excellence Award'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['AI Research Lab', 'Cloud Infrastructure'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Shahu Patil', 
+      role: 'Manager',
+      icon: <Users className="w-12 h-12 text-cyan-400" />,
+      bio: 'Experienced project manager with a track record of successful tech project deliveries.',
+      skills: ['Project Management', 'Agile', 'Strategic Planning'],
+      achievements: ['PMI Certified', '15+ Successful Projects'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['DevOps Initiative', 'Team Expansion'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Veeraditya Karan Parakh',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
+      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/veeradi34',
+        twitter: 'https://www.instagram.com/veer3_1/',
+        linkedin: 'https://www.linkedin.com/in/veeraditya-karan-parakh-68a869282/'
+      },
+      projects: ['C4GT, ONDC', 'LearnerSpace ML and Hello FoSS ML Diffusivity'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Samarth Aggarwal',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Lopamudra Biswal',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
+      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '',
+        twitter: '#',
+        linkedin: 'http://linkedin.com/in/lopamudra-biswal-1a4266294'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Priyam Raj',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/Priyam12345-cloud',
+        twitter: 'https://www.instagram.com/priyamraj572/profilecard/?igsh=MnFpamY5M2o2eDMy',
+        linkedin: ' https://www.linkedin.com/in/priyam-raj-b4598a282?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Tushar Roy',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Param Pabari',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'http://www.linkedin.com/in/param-pabari',
+        twitter: 'https://www.instagram.com/param.svg/',
+        linkedin: 'http://www.linkedin.com/in/param-pabari'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Husain Batterywala',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Shresth Keshari',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/shresth-keshari',
+        twitter: 'https://www.instagram.com/social.lonewolf/profilecard/?igsh=MWlvdTA3b3NlcmN1Ng==',
+        linkedin: 'https://www.linkedin.com/in/shresth-keshari-626b2a267?fbclid=PAY2xjawHR2WNleHRuA2FlbQIxMQABprdnb6OIlAkXWDlyB5-p7GSVTfa63JNglAyQSse4Cpt4yOp4Md7k5T-qjw_aem_tq8epkqby1COBksqbqgSjw'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Pratyaksh Bharadwaj',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/Pratyaksh2309',
+        twitter: 'https://www.instagram.com/pratyaksh._.23?igsh=MXF4emhsaGQ4cXplZw==',
+        linkedin: 'https://www.linkedin.com/in/pratyaksh-bhardwaj-b2309ar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Aryan Kayanade',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/TheDarKnight50',
+        twitter: '#',
+        linkedin: 'https://www.linkedin.com/in/aryan-kayande-6102a5284/'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    }
+  ];
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const simulateTyping = (memberId, text) => {
+    let currentText = '';
+    const words = ['> Loading profile...', '> Accessing database...', '> Decrypting data...', '> Display: OK'];
+    let wordIndex = 0;
+    let charIndex = 0;
+
+    const typeInterval = setInterval(() => {
+      if (wordIndex === words.length) {
+        clearInterval(typeInterval);
+        setExpandedCards(prev => ({ ...prev, [memberId]: true }));
+        setTypingText(prev => ({ ...prev, [memberId]: '' }));
+        return;
+      }
+
+      const currentWord = words[wordIndex];
+      if (charIndex === currentWord.length + 1) {
+        currentText += '\n';
+        wordIndex++;
+        charIndex = 0;
+      } else {
+        currentText = words.slice(0, wordIndex).join('\n') + '\n' + currentWord.slice(0, charIndex);
+        charIndex++;
+      }
+
+      setTypingText(prev => ({ ...prev, [memberId]: currentText }));
+    }, 50);
+  };
+
+  const MemberCard = ({ member, index }) => {
+    const isExpanded = expandedCards[index];
+    
+    return (
+      <Card className="relative overflow-hidden bg-gray-900/50 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20">
+        {/* Profile Section */}
+        <div className="p-6 space-y-6">
+          {/* Image and Basic Info */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden ring-2 ring-cyan-500/50">
+              <img 
+                src={member.imageUrl} 
+                alt={member.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">{member.name}</h3>
+              <p className="text-cyan-400">{member.role}</p>
+            </div>
+          </div>
+
+          {/* Bio */}
+          <p className="text-gray-300 text-sm">{member.bio}</p>
+
+          {/* Social Links */}
+          <div className="flex gap-4">
+            {member.social.github && (
+              <a 
+                href={member.social.github} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-5 h-5" />
+              </a>
+            )}
+            {member.social.twitter && (
+              <a 
+                href={member.social.twitter} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+            )}
+            {member.social.linkedin && (
+              <a 
+                href={member.social.linkedin} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            )}
+          </div>
+
+          {!isExpanded && (
+            <button 
+              onClick={() => {
+                simulateTyping(index, member.name);
+              }}
+              className="w-full bg-gray-800 text-cyan-400 px-4 py-2 rounded-md font-mono text-sm hover:bg-gray-700 transition-colors"
+            >
+              $ ./view-profile {member.name.toLowerCase().replace(' ', '-')}
+            </button>
+          )}
+        </div>
+
+        {/* Terminal Output */}
+        {typingText[index] && (
+          <div className="px-6 pb-4">
+            <pre className="font-mono text-xs text-cyan-400 whitespace-pre-wrap">
+              {typingText[index]}
+            </pre>
+          </div>
+        )}
+
+        {/* Details Section */}
+        <div className={`border-t border-cyan-500/20 transition-all duration-500 ${
+          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        } overflow-hidden`}>
+          <div className="p-6 space-y-6">
+            {/* Skills */}
+            <div>
+              <h4 className="text-sm font-semibold text-cyan-400 mb-3">Skills</h4>
+              <div className="flex flex-wrap gap-2">
+                {member.skills.map((skill, index) => (
+                  <span 
+                    key={index}
+                    className="bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded-md text-xs"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Projects */}
+            <div>
+              <h4 className="text-sm font-semibold text-cyan-400 mb-3">Projects</h4>
+              <div className="space-y-2">
+                {member.projects.map((project, index) => (
+                  <div 
+                    key={index}
+                    className="text-sm text-gray-300"
+                  >
+                    • {project}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* View Profile Button */}
+            <button 
+              onClick={() => setSelectedMember(member)}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+            >
+              View Full Profile
+            </button>
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+
+  return (
+    <div className="space-y-12 relative">
+      {/* Cursor gradient follow effect */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: `radial-gradient(600px at ${cursorPos.x}px ${cursorPos.y}px, rgba(103, 232, 249, 0.15), transparent 80%)`
+        }}
+      />
+      
+      <div className="text-center relative">
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text mb-6">
+          Meet Our Team
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          The brilliant minds behind WnCC's success
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        {teamMembers.map((member, index) => (
+          <MemberCard key={index} member={member} />
+        ))}
+      </div>
+
+      {/* Selected member modal */}
+      {selectedMember && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-8 rounded-2xl max-w-2xl w-full mx-4 relative">
+            <button 
+              onClick={() => setSelectedMember(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex-shrink-0">
+                <div className="w-48 h-48 rounded-xl overflow-hidden">
+                  <img 
+                    src={selectedMember.imageUrl} 
+                    alt={selectedMember.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex-grow">
+                <div className="flex items-center gap-4 mb-4">
+                  {selectedMember.icon}
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{selectedMember.name}</h3>
+                    <p className="text-cyan-400">{selectedMember.role}</p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 mb-6">{selectedMember.bio}</p>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-3">Projects</h4>
+                    <ul className="space-y-2">
+                      {selectedMember.projects.map((project, index) => (
+                        <li key={index} className="text-gray-300">{project}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-3">Skills</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.skills.map((skill, index) => (
+                        <span 
+                          key={index}
+                          className="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-sm"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+const ContactPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      alert('Message sent successfully!');
+    }, 1000);
+  };
+
+  return (
+    <div className="space-y-12 relative">
+      <div className="text-center relative">
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text mb-6">
+          Contact Us
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Have questions? We'd love to hear from you.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        <Card>
+          <h3 className="text-2xl font-bold text-cyan-400 mb-6">Get in Touch</h3>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-gray-300 mb-2">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Subject</label>
+              <input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Message</label>
+              <textarea
+                value={formData.message}
+                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                className="w-full h-32 bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-cyan-500 text-white py-3 rounded hover:bg-cyan-600 transition-all duration-300 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
+        </Card>
+
+        <div className="space-y-6">
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Visit Us</h3>
+            <p className="text-gray-300">
+              Web and Coding Club<br />
+              Student Activity Center<br />
+              IIT Bombay, Powai<br />
+              Mumbai - 400076
+            </p>
+          </Card>
+
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Contact Info</h3>
+            <div className="space-y-3">
+              <p className="text-gray-300">Email: wncc@iitb.ac.in</p>
+              <p className="text-gray-300">Phone: +91 7668192399/9146050850</p>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Follow Us</h3>
+            <div className="flex gap-4">
+              <a href="https://github.com/wncc" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Github className="w-6 h-6" />
+              </a>
+              <a href="https://www.instagram.com/wncc.iitb/" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Instagram className="w-6 h-6" />
+              </a>
+              <a href="https://www.linkedin.com/company/wncc-iitb/posts/?feedView=all" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Linkedin className="w-6 h-6" />
+              </a>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const WebsitePreview = () => {
+  const [currentPage, setCurrentPage] = useState('Home');
+
+  const PageComponent = {
+    Home: HomePage,
+    Events: EventsPage,
+    Resources: ResourcesPage,
+    Team: TeamPage,
+    Contact: ContactPage
+  }[currentPage];
+
+  const quickLinks = [
+    { title: 'Documentation', url: '#' },
+    { title: 'Tutorials', url: '#' },
+    { title: 'Projects', url: '#' },
+    { title: 'Blog', url: '#' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <nav className="bg-gray-900/50 backdrop-blur-lg border-b border-cyan-500/20 p-4 sticky top-0 z-50">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="text-cyan-400 font-bold text-xl">WnCC IITB</div>
+          <div className="flex gap-6">
+            {['Home', 'Events', 'Resources', 'Team', 'Contact'].map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                  currentPage === page
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-gray-300 hover:text-cyan-400'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <main className="container mx-auto px-4 py-8">
+        <PageComponent />
+      </main>
+      
+      <footer className="bg-gray-900/50 backdrop-blur-lg border-t border-cyan-500/20 p-8 mt-16">
+        <div className="container mx-auto grid md:grid-cols-4 gap-8">
+         
+          
+          {/* Quick Links Section */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.url}
+                    className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Contact</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li>wncc@iitb.ac.in</li>
+              <li>Student Activity Center</li>
+              <li>IIT Bombay, Powai</li>
+              <li>Mumbai - 400076</li>
+            </ul>
+          </div>
+          
+          {/* Social Links */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Connect</h3>
+            <div className="flex gap-4">
+              <a href="https://github.com/wncc" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Github className="w-6 h-6" />
+              </a>
+              <a href="https://x.com/i/flow/login?redirect_after_login=%2Fwncc_iitb" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Twitter className="w-6 h-6" />
+              </a>
+              <a href="https://www.linkedin.com/company/wncc-iitb/posts/?feedView=all" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Linkedin className="w-6 h-6" />
+              </a>
+              <a href="https://www.instagram.com/wncc.iitb/" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Instagram className="w-6 h-6" />
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div className="container mx-auto mt-8 pt-8 border-t border-cyan-500/20 text-center">
+          <p className="text-gray-400">© 2024 Web and Coding Club, IIT Bombay. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default WebsitePreview;
+
+
+
+
+import React, { useState, useEffect, useRef } from 'react';
+
+import { 
+  Code, 
+  Laptop,
+  Cpu,
+  GitBranch,
+  Trophy,
+  Star,
+  Sparkles,
+  Users,
+  Calendar,
+  Lightbulb,
+  BookOpen,
+  UserCheck,
+  MessageCircle,
+  Github,
+  Twitter,
+  Linkedin,
+  Activity,
+  Instagram,
+  Award,
+  Zap,
+  Brain,
+  Globe,
+  MousePointer,
+  Sparkles as SparklesIcon,
+  X,
+  Search,
+  Newspaper,
+  ArrowRight,
+  Braces,
+  Lock,
+  Sword,
+  Hash,
+  Rocket,
+  Code2
+} from 'lucide-react';
+
+
+// Card component for consistent styling
+const Card = ({ children, className = "", onMouseEnter, onMouseLeave }) => (
+  <div 
+    className={`bg-gray-800/50 backdrop-blur p-6 rounded-xl border border-cyan-500/20 transition-all duration-300 hover:shadow-lg hover:border-cyan-500/40 ${className}`}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
+    {children}
+  </div>
+);
+const generateCalendarUrl = (event) => {
+  const encodedText = encodeURIComponent(event.title);
+  const encodedDetails = encodeURIComponent(event.description);
+  const encodedLocation = encodeURIComponent(event.location);
+  const startDate = new Date(event.date).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  const endDate = new Date(event.endDate).toISOString().replace(/-|:|\.\d\d\d/g, '');
+  
+  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodedText}&details=${encodedDetails}&location=${encodedLocation}&dates=${startDate}/${endDate}`;
+};
+const TechNewsFeed = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const news = [
+    {
+      title: "New AI Research Lab Launch",
+      date: "2 hours ago",
+      category: "Research",
+      description: "Exploring the frontiers of artificial intelligence and machine learning."
+    },
+    {
+      title: "Open Source Sprint Success",
+      date: "1 day ago",
+      category: "Development",
+      description: "Students contributed to major open source projects during the weekend sprint."
+    },
+    {
+      title: "Coding Competition Results",
+      date: "3 days ago",
+      category: "Competition",
+      description: "Team Alpha secured first place in the national coding championship."
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % news.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <Card>
+      <h3 className="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+        <Newspaper className="w-5 h-5" />
+        Tech News Feed
+      </h3>
+      <div className="relative overflow-hidden h-48">
+        {news.map((item, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transform transition-all duration-500 ${
+              index === activeIndex 
+                ? 'translate-x-0 opacity-100' 
+                : 'translate-x-full opacity-0'
+            }`}
+          >
+            <span className="bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded text-sm">
+              {item.category}
+            </span>
+            <h4 className="text-lg font-semibold text-white mt-2 mb-1">{item.title}</h4>
+            <p className="text-gray-400 text-sm mb-2">{item.date}</p>
+            <p className="text-gray-300">{item.description}</p>
+            <button className="mt-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+              Read More <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-2 mt-4">
+        {news.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === activeIndex 
+                ? 'bg-cyan-400 w-4' 
+                : 'bg-gray-600 hover:bg-gray-500'
+            }`}
+          />
+        ))}
+      </div>
+    </Card>
+  );
+};
+const ParticleEffect = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.speed = 0.5;
+        this.size = Math.random() * 2;
+      }
+
+      update() {
+        this.y -= this.speed;
+        if (this.y < 0) {
+          this.y = canvas.height;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = 'rgba(103, 232, 249, 0.5)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 100; i++) {
+      particles.push(new Particle());
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+    />
+  );
+};
+
+// Stats component for HomePage
+const StatsCounter = ({ label, endValue, duration = 2000 }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime;
+    let animationFrame;
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = (currentTime - startTime) / duration;
+
+      if (progress < 1) {
+        setCount(Math.floor(endValue * progress));
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(endValue);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [endValue, duration]);
+
+  return (
+    <div className="text-center p-4">
+      <div className="text-4xl font-bold text-cyan-400 mb-2">{count}+</div>
+      <div className="text-gray-300">{label}</div>
+    </div>
+  );
+};
+const LiveCodeEditor = () => {
+  const [code, setCode] = useState('// Try this:\nconsole.log("Hello WnCC!");');
+  const [output, setOutput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const simulateCodeExecution = () => {
+    setIsLoading(true);
+    setOutput('');
+    
+    const lines = [];
+    setTimeout(() => {
+      try {
+        // Simulate safe code execution with predefined responses
+        if (code.includes('console.log')) {
+          const match = code.match(/console\.log\(['"](.*)['"]\)/);
+          if (match) lines.push(`> ${match[1]}`);
+        }
+        if (code.includes('for')) lines.push('> Loop detected! 🔄');
+        if (code.includes('function')) lines.push('> Function defined! 🎯');
+        if (code.includes('if')) lines.push('> Conditional logic found! 🤔');
+        
+        setOutput(lines.join('\n') || '> Code executed successfully! ✨');
+      } catch (err) {
+        setOutput('Error: ' + err.message);
+      }
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-cyan-400">Live Code Editor</h3>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setCode('// Fresh start!')}
+            className="px-3 py-1 bg-gray-700 rounded text-sm"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        className="w-full bg-gray-900 text-cyan-400 font-mono p-4 rounded mb-4 h-32 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        spellCheck="false"
+      />
+      <button 
+        onClick={simulateCodeExecution}
+        disabled={isLoading}
+        className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50"
+      >
+        {isLoading ? 'Running...' : 'Run Code ▶'}
+      </button>
+      {output && (
+        <div className="mt-4 p-4 bg-gray-900 rounded font-mono">
+          <pre className="text-green-400 whitespace-pre-wrap">{output}</pre>
+        </div>
+      )}
+    </Card>
+  );
+};
+// Activity Feed component for HomePage
+const ActivityFeed = () => {
+  const activities = [
+    { text: "Succesful Completion of Hello-FOSS 2024", time: "2 days ago" },
+    { text: "Hackathon registration opened", time: "5 hours ago" },
+    { text: "Workshop materials updated", time: "1 day ago" }
+  ];
+
+  return (
+    <div className="bg-gray-800/50 p-4 rounded-xl">
+      <h3 className="text-xl font-bold text-cyan-400 mb-4">Recent Activity</h3>
+      {activities.map((activity, index) => (
+        <div key={index} className="flex items-center gap-3 mb-3 p-2 hover:bg-gray-700/30 rounded">
+          <Activity className="text-cyan-400 w-4 h-4" />
+          <div>
+            <p className="text-white">{activity.text}</p>
+            <p className="text-gray-400 text-sm">{activity.time}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// RiddleGame Component
+const RiddleGame = () => {
+  const riddles = [
+    {
+      question: "In a room of 23 people, what's the probability that at least two people share the same birthday? (Answer in percentage, rounded to nearest whole number)",
+      answer: "51"
+    },
+    {
+      question: "You have 8 identical balls, but 1 is slightly heavier. Using a balance scale, what's the minimum number of weighings needed to find the heavier ball?",
+      answer: "2"
+    },
+    {
+      question: "100 people standing in a circle in an order from 1 to 100. Person 1 has a sword. He kills the next person (2) and gives the sword to the next living person (3). All people do the same until only one survives. Which number lives?",
+      answer: "73"
+    },
+    {
+      question: "A snail climbs up a 10-foot wall. Each day it climbs up 3 feet, but slides down 2 feet at night. How many days will it take the snail to reach the top?",
+      answer: "8"
+    },
+    {
+      question: "You have a 5-liter jug and a 3-liter jug. How can you measure exactly 4 liters? Enter the number of steps required.",
+      answer: "6"
+    },
+    {
+      question: "In binary representation, how many numbers from 1 to 20 (inclusive) have exactly two 1's in their binary form?",
+      answer: "6"
+    },
+    {
+      question: "A message is encoded by shifting each letter by its position (1st letter shifted by 1, 2nd by 2, etc). 'HAL' becomes 'IBM'. What does 'BUG' become?",
+      answer: "DIJ"
+    },
+    {
+      question: "On a 3x3 grid, how many unique paths are there from top-left to bottom-right if you can only move right or down?",
+      answer: "6"
+    },
+    {
+      question: "In an array of integers from 1 to n, one number appears twice while one number is missing. If array sum is 55 and n is 10, what's the duplicate number?",
+      answer: "7"
+    },
+    {
+      question: "Given a fair coin, what's the expected number of flips needed to get two consecutive heads? (Round to one decimal place)",
+      answer: "6"
+    },
+    {
+      question: "How many trailing zeros are in 100 factorial (100!)?",
+      answer: "24"
+    },
+    {
+      question: "What's the maximum number of pieces you can get by cutting a circular pizza with 6 straight cuts?",
+      answer: "22"
+    },
+    {
+      question: "If you have 9 coins and one is counterfeit (lighter), minimum number of weighings on a balance scale to find it?",
+      answer: "2"
+    },
+    {
+      question: "How many different ways can you make change for $1 using standard US coins (1,5,10,25,50 cents)?",
+      answer: "292"
+    },
+    {
+      question: "In a sorted array of n distinct integers, if array[index] = index for some index, this index is called a magic index. For array [-5,-3,0,3,7], what's the magic index?",
+      answer: "3"
+    }
+  ];
+
+  const [currentRiddle, setCurrentRiddle] = useState(riddles[0]);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [streak, setStreak] = useState(0);
+  const [usedRiddles, setUsedRiddles] = useState(new Set([0]));
+  const [showHint, setShowHint] = useState(false);
+
+  const getNextRiddle = () => {
+    let availableIndices = Array.from({ length: riddles.length }, (_, i) => i)
+      .filter(i => !usedRiddles.has(i));
+    
+    if (availableIndices.length === 0) {
+      setUsedRiddles(new Set([0]));
+      availableIndices = Array.from({ length: riddles.length }, (_, i) => i);
+    }
+
+    const nextIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    setCurrentRiddle(riddles[nextIndex]);
+    setUsedRiddles(prev => new Set([...prev, nextIndex]));
+    setShowHint(false);
+  };
+
+  const checkAnswer = () => {
+    if (userAnswer.toLowerCase().trim() === currentRiddle.answer.toLowerCase()) {
+      setStreak(prev => prev + 1);
+      setFeedback('Correct! 🎉 Get ready for the next question...');
+      setUserAnswer('');
+      setShowHint(false);
+      setTimeout(() => {
+        setFeedback('');
+        getNextRiddle();
+      }, 2000);
+    } else {
+      setFeedback('Incorrect! Try again 💡');
+      setStreak(0);
+    }
+  };
+
+  return (
+    <Card className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-cyan-400">Coding Interview Practice</h3>
+        <div className="flex gap-4 items-center">
+          <span className="bg-cyan-500/20 px-3 py-1 rounded-full text-cyan-400">
+            Streak: {streak} 🔥
+          </span>
+          <button
+            onClick={() => {
+              setStreak(0);
+              setUserAnswer('');
+              setFeedback('');
+              setShowHint(false);
+              getNextRiddle();
+            }}
+            className="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded-full transition-colors"
+          >
+            Skip
+          </button>
+        </div>
+      </div>
+      <div className="bg-gray-800 p-4 rounded-lg mb-6">
+        <p className="text-lg text-gray-200">{currentRiddle.question}</p>
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={userAnswer}
+          onChange={(e) => setUserAnswer(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
+          className="flex-1 bg-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          placeholder="Your answer..."
+        />
+        <button
+          onClick={checkAnswer}
+          className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
+        >
+          Submit
+        </button>
+      </div>
+      {feedback && (
+        <div className={`mt-4 text-center ${feedback.includes('Correct') ? 'text-green-400' : 'text-cyan-400'}`}>
+          {feedback}
+        </div>
+      )}
+    </Card>
+  );
+};
+const FeatureCard = ({ icon: Icon, title, description }) => (
+  <Card className="text-center">
+    <Icon className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+    <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+    <p className="text-gray-300">{description}</p>
+  </Card>
+);
+
+// About Us Section
+const AboutUs = () => (
+  <div className="mt-20 relative">
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/50 pointer-events-none" />
+    <h2 className="text-4xl font-bold text-center text-cyan-400 mb-8">About Us</h2>
+    <div className="grid md:grid-cols-3 gap-8">
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Mission</h3>
+        <p className="text-gray-300">
+        We aim to foster a culture of learning and innovation by empowering students with the skills to excel in web development, competitive coding, open-source contributions, and emerging technologies.
+        </p>
+      </Card>
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Vision</h3>
+        <p className="text-gray-300">
+        Create an inclusive environment where students collaborate, innovate, and grow together as problem-solvers and developers.
+        </p>
+      </Card>
+      <Card>
+        <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Values</h3>
+        <p className="text-gray-300">
+          Innovation, collaboration, excellence, and continuous learning.
+        </p>
+      </Card>
+    </div>
+  </div>
+);
+
+const HomePage = () => {
+  const [typewriterText, setTypewriterText] = useState('');
+  const fullText = "Coders Together Strong";
+  
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      setTypewriterText(fullText.substring(0, index));
+      index++;
+      if (index > fullText.length) {
+        setTimeout(() => {
+          index = 0;
+        }, 2000);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+  const features = [
+    {
+      icon: Brain,
+      title: "Fast Paced-Courses",
+      description: "Deep dive into topics like machine learning, Web Development, and more"
+    },
+    {
+      icon: Globe,
+      title: "Hackathons",
+      description: "Compete with like minded-developers"
+    },
+    {
+      icon: Zap,
+      title: "Expert Talk Sessions",
+      description: "Quick, intensive tech sessions"
+    }
+  ];
+  return (
+    <div className="space-y-12 relative">
+      <ParticleEffect />
+      
+      <div className="text-center relative">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/20 rounded-full filter blur-3xl" />
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/20 rounded-full filter blur-3xl" />
+        <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
+          WnCC IIT Bombay
+        </h1>
+        <div className="h-8">
+          <span className="font-mono text-2xl text-cyan-400">
+            {typewriterText}
+            <span className="animate-pulse">_</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-4 gap-6">
+        <StatsCounter label="Active Members" endValue={500} />
+        <StatsCounter label="Projects" endValue={150} />
+        <StatsCounter label="Events" endValue={50} />
+        <StatsCounter label="Awards" endValue={25} />
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {features.map((feature, index) => (
+          <FeatureCard key={index} {...feature} />
+        ))}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <LiveCodeEditor />
+          <ActivityFeed />
+        </div>
+        <div className="space-y-8">
+          <RiddleGame />
+          <TechNewsFeed />
+          
+        </div>
+      </div>
+
+      <AboutUs />
+    </div>
+  );
+};
+const EventsPage = () => {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const categories = [
+    { id: 'all', name: 'ALL_EVENTS', icon: Calendar },
+    { id: 'gc', name: 'GC_EVENTS.exe', icon: Trophy },
+    { id: 'codewars', name: 'CODEWARS.sys', icon: Sword },
+    { id: 'workshops', name: 'WORKSHOPS.bin', icon: Laptop }
+  ];
+
+  const events = [
+    {
+      title: 'Algo GC',
+      category: 'gc',
+      difficulty: 'LEVEL::ADVANCED',
+      date: '2025-01-28T20:00:00Z',
+      author: 'WnCC Team',
+      icon: <Code className="w-8 h-8" />,
+      color: 'from-purple-500 to-pink-500',
+      description: '> Strategy\n> Algorithms\n> Problem Solving',
+      tags: ['algorithms', 'competition', 'gc'],
+      metrics: {
+        participants: 150,
+        prize: 'GC Points'
+      },
+      link: '/register/algo-gc'
+    },
+    {
+      title: 'Machine Learning GC',
+      category: 'gc',
+      difficulty: 'LEVEL::ADVANCED',
+      date: '2025-02-10T20:00:00Z',
+      author: 'WnCC Team',
+      icon: <Brain className="w-8 h-8" />,
+      color: 'from-cyan-500 to-blue-500',
+      description: '> Neural Networks\n> Deep Learning\n> Model Building',
+      tags: ['ml', 'ai', 'gc'],
+      metrics: {
+        participants: 120,
+        prize: 'GC Points'
+      },
+      link: '/register/ml-gc'
+    },
+    {
+      title: 'Codewars',
+      category: 'codewars',
+      difficulty: 'LEVEL::INTERMEDIATE',
+      date: '2025-03-10T00:00:00Z',
+      author: 'WnCC Team',
+      icon: <Sword className="w-8 h-8" />,
+      color: 'from-green-500 to-emerald-500',
+      description: '> Strategy Gaming\n> Competitive Coding\n> Team Building',
+      tags: ['coding', 'strategy', 'competition'],
+      metrics: {
+        participants: 200,
+        prize: '$1000'
+      },
+      link: '/register/codewars'
+    },
+    {
+      title: 'Web Development Workshop',
+      category: 'workshops',
+      difficulty: 'LEVEL::BEGINNER',
+      date: '2025-02-15T20:00:00Z',
+      author: 'WnCC Team',
+      icon: <Globe className="w-8 h-8" />,
+      color: 'from-orange-500 to-red-500',
+      description: '> Frontend Development\n> Backend Systems\n> Database Design',
+      tags: ['web', 'development', 'workshop'],
+      metrics: {
+        participants: 100,
+        prize: 'Certificate'
+      },
+      link: '/register/web-workshop'
+    },
+    {
+      title: 'Python Workshop',
+      category: 'workshops',
+      difficulty: 'LEVEL::BEGINNER',
+      date: '2025-02-20T20:00:00Z',
+      author: 'WnCC Team',
+      icon: <Code2 className="w-8 h-8" />,
+      color: 'from-blue-500 to-violet-500',
+      description: '> Python Basics\n> Data Structures\n> Libraries & Tools',
+      tags: ['python', 'programming', 'workshop'],
+      metrics: {
+        participants: 80,
+        prize: 'Certificate'
+      },
+      link: '/register/python-workshop'
+    }
+  ];
+
+  const EventCard = ({ event }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    const timeUntilEvent = () => {
+      const now = new Date();
+      const eventDate = new Date(event.date);
+      const diff = eventDate - now;
+      
+      if (diff < 0) return 'EVENT_COMPLETED';
+      
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      
+      return `T-${days}d::${hours}h`;
+    };
+
+    return (
+      <Card 
+        className="group relative bg-gray-900/50 backdrop-blur-xl border border-gray-800 overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
+        
+        {/* Cyberpunk corner decorations */}
+        <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute top-0 right-0 w-24 h-1 bg-gradient-to-r ${event.color}`} />
+          <div className={`absolute top-0 right-0 w-1 h-24 bg-gradient-to-b ${event.color}`} />
+        </div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r ${event.color}`} />
+          <div className={`absolute bottom-0 left-0 w-1 h-24 bg-gradient-to-b ${event.color}`} />
+        </div>
+
+        <div className="relative p-6 space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className={`p-3 rounded-xl bg-gradient-to-r ${event.color}`}>
+              {event.icon}
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <span className="font-mono text-sm text-gray-500">
+                {event.difficulty}
+              </span>
+              <span className="font-mono text-sm text-gray-500">
+                {timeUntilEvent()}
+              </span>
+            </div>
+          </div>
+
+          {/* Title with tech decoration */}
+          <div className="relative">
+            <h3 className={`text-2xl font-bold bg-gradient-to-r ${event.color} text-transparent bg-clip-text`}>
+              {event.title}
+            </h3>
+            <div className="absolute -left-2 top-1/2 w-1 h-6 -translate-y-1/2 bg-gradient-to-b from-transparent via-cyan-500 to-transparent" />
+          </div>
+
+          {/* Date */}
+          <div className="font-mono text-gray-400 text-sm">
+            DATE::{new Date(event.date).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </div>
+
+          {/* Description with terminal style */}
+          <div className="font-mono text-sm text-gray-400 space-y-1">
+            {event.description.split('\n').map((line, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="text-cyan-500">{line}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {event.tags.map((tag, index) => (
+              <span
+                key={index}
+                className={`px-3 py-1 rounded-full bg-gradient-to-r ${event.color} bg-opacity-10 
+                           text-white text-sm font-mono flex items-center gap-2`}
+              >
+                <Hash className="w-3 h-3" />
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Metrics */}
+          <div className="grid grid-cols-2 gap-4 font-mono text-sm">
+            <div className="text-center">
+              <div className="text-gray-500">PARTICIPANTS</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${event.color} text-transparent bg-clip-text`}>
+                {event.metrics.participants}+
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-gray-500">PRIZE_POOL</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${event.color} text-transparent bg-clip-text`}>
+                {event.metrics.prize}
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            onClick={() => window.location.href = event.link}
+            className={`w-full py-2 rounded-lg bg-gradient-to-r ${event.color} text-white 
+                       font-mono flex items-center justify-center gap-2 transition-transform
+                       hover:scale-[1.02] active:scale-[0.98]`}
+          >
+            <Rocket className="w-4 h-4" />
+            REGISTER_NOW
+          </button>
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 relative">
+      {/* Animated circuit-like background */}
+      <div className="fixed inset-0 overflow-hidden opacity-20">
+        <div className="absolute w-full h-full">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-cyan-500"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: '1px',
+                height: `${Math.random() * 100}px`,
+                opacity: Math.random() * 0.5
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Header with cyberpunk styling */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10" />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
+                WnCC::EVENTS_v2.4
+              </h1>
+              <div className="font-mono text-gray-500 flex items-center gap-4">
+                <span>SYS::ACTIVE</span>
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                <span>{currentTime.toLocaleTimeString()}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 font-mono text-sm">
+              <div className="flex items-center gap-2 text-cyan-500">
+                <Activity className="w-4 h-4" />
+                <span>EVENTS_ONLINE</span>
+              </div>
+              <div className="flex items-center gap-2 text-purple-500">
+                <Users className="w-4 h-4" />
+                <span>REGISTRATION_OPEN</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and filters */}
+          <div className="flex gap-4 mb-8">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="SEARCH_EVENTS::"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-900/50 border border-gray-800 rounded-lg px-4 py-3 pl-12 
+                         text-white focus:outline-none focus:border-cyan-500 font-mono"
+              />
+              <Search className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
+            </div>
+            <div className="flex gap-2">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-4 py-2 rounded-lg font-mono flex items-center gap-2 transition-colors
+                             ${activeCategory === category.id
+                               ? 'bg-cyan-500 text-white'
+                               : 'bg-gray-900/50 text-gray-400 hover:bg-gray-800'}`}
+                >
+                  <category.icon className="w-4 h-4" />
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Events grid */}
+      <div className="container mx-auto px-4 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          {events
+            .filter(event => 
+              (activeCategory === 'all' || event.category === activeCategory) &&
+              (searchQuery === '' || 
+               event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               event.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+            )
+            .map((event, index) => (
+              <EventCard key={index} event={event} />
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};  
+const ResourcesPage = () => {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const categories = [
+    { id: 'all', name: 'ALL_RESOURCES', icon: BookOpen },
+    { id: 'tutorials', name: 'TUTORIALS.exe', icon: Code },
+    { id: 'courses', name: 'COURSES.sys', icon: Laptop },
+    { id: 'projects', name: 'PROJECTS.bin', icon: GitBranch }
+  ];
+
+  const resources = [
+    {
+      title: 'Getting Started with Webdev',
+      category: 'tutorials',
+      difficulty: 'LEVEL::INTERMEDIATE',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Code className="w-8 h-8" />,
+      color: 'from-purple-500 to-pink-500',
+      description: '> Frontend Development\n> React Architecture\n> UI/UX Engineering',
+      tags: ['react', 'javascript', 'frontend'],
+      metrics: {
+        views: 1200,
+        likes: 345
+      },
+      link: 'https://github.com/wncc/Web-Development-LS-24'
+    },
+    {
+      title: 'Data Structures and Algorithms',
+      category: 'courses',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '20 hours',
+      author: 'WnCC Team',
+      icon: <Brain className="w-8 h-8" />,
+      color: 'from-cyan-500 to-blue-500',
+      description: '> Algorithm Design\n> Data Structures\n> Problem Solving',
+      tags: ['algorithms', 'complexity', 'optimization'],
+      metrics: {
+        views: 800,
+        likes: 230
+      },
+      link: 'https://github.com/wncc/DSA-LS-24'
+    },
+    {
+      title: 'Machine Learning Projects',
+      category: 'projects',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '15 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-green-500 to-emerald-500',
+      description: '> Neural Networks\n> Deep Learning\n> Data Science',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Machine-Learning-LS-24'
+    },
+    {
+      title: 'GANs and Diffusion Models',
+      category: 'projects',
+      difficulty: 'LEVEL::ADVANCED',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-orange-500 to-red-500',
+      description: '> Generative AI\n> Deep Learning\n> Computer Vision',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Hello-FOSS-ML-Diffusivity'
+    },
+    {
+      title: 'Parallel Programming',
+      category: 'projects',
+      difficulty: 'LEVEL::INTERMEDIATE',
+      duration: '10 hours',
+      author: 'WnCC Team',
+      icon: <Cpu className="w-8 h-8" />,
+      color: 'from-blue-500 to-violet-500',
+      description: '> Multi-threading\n> Parallel Algorithms\n> Performance Optimization',
+      tags: ['ml', 'python', 'data-science'],
+      metrics: {
+        views: 1500,
+        likes: 420
+      },
+      link: 'https://github.com/wncc/Hello-Foss-PyThread.cpp'
+    }
+  ];
+
+  const ResourceCard = ({ resource }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+      <Card 
+        className="group relative bg-gray-900/50 backdrop-blur-xl border border-gray-800 overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className={`absolute inset-0 bg-gradient-to-r ${resource.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
+        
+        {/* Cyberpunk-style corner decorations */}
+        <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute top-0 right-0 w-24 h-1 bg-gradient-to-r ${resource.color}`} />
+          <div className={`absolute top-0 right-0 w-1 h-24 bg-gradient-to-b ${resource.color}`} />
+        </div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 overflow-hidden">
+          <div className={`absolute bottom-0 left-0 w-24 h-1 bg-gradient-to-r ${resource.color}`} />
+          <div className={`absolute bottom-0 left-0 w-1 h-24 bg-gradient-to-b ${resource.color}`} />
+        </div>
+
+        <div className="relative p-6 space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className={`p-3 rounded-xl bg-gradient-to-r ${resource.color}`}>
+              {resource.icon}
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <span className="font-mono text-sm text-gray-500">
+                {resource.difficulty}
+              </span>
+              <span className="font-mono text-sm text-gray-500">
+                DURATION::{resource.duration}
+              </span>
+            </div>
+          </div>
+
+          {/* Title with tech decoration */}
+          <div className="relative">
+            <h3 className={`text-2xl font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+              {resource.title}
+            </h3>
+            <div className="absolute -left-2 top-1/2 w-1 h-6 -translate-y-1/2 bg-gradient-to-b from-transparent via-cyan-500 to-transparent" />
+          </div>
+
+          {/* Author */}
+          <div className="font-mono text-gray-400 text-sm">
+            AUTHOR::{resource.author}
+          </div>
+
+          {/* Description with terminal style */}
+          <div className="font-mono text-sm text-gray-400 space-y-1">
+            {resource.description.split('\n').map((line, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="text-cyan-500">{line}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {resource.tags.map((tag, index) => (
+              <span
+                key={index}
+                className={`px-3 py-1 rounded-full bg-gradient-to-r ${resource.color} bg-opacity-10 
+                           text-white text-sm font-mono flex items-center gap-2`}
+              >
+                <Braces className="w-3 h-3" />
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Metrics */}
+          <div className="grid grid-cols-2 gap-4 font-mono text-sm">
+            <div className="text-center">
+              <div className="text-gray-500">VIEWS</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+                {resource.metrics.views}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-gray-500">LIKES</div>
+              <div className={`text-lg font-bold bg-gradient-to-r ${resource.color} text-transparent bg-clip-text`}>
+                {resource.metrics.likes}
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            onClick={() => window.open(resource.link, '_blank')}
+            className={`w-full py-2 rounded-lg bg-gradient-to-r ${resource.color} text-white 
+                       font-mono flex items-center justify-center gap-2 transition-transform
+                       hover:scale-[1.02] active:scale-[0.98]`}
+          >
+            <Github className="w-4 h-4" />
+            INITIALIZE_PROJECT
+          </button>
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 relative">
+      {/* Animated circuit-like background */}
+      <div className="fixed inset-0 overflow-hidden opacity-20">
+        <div className="absolute w-full h-full">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-cyan-500"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                width: '1px',
+                height: `${Math.random() * 100}px`,
+                opacity: Math.random() * 0.5
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Header with cyberpunk styling */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10" />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
+                WnCC::RESOURCES_v2.4
+              </h1>
+              <div className="font-mono text-gray-500 flex items-center gap-4">
+                <span>SYS::ACTIVE</span>
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                <span>{currentTime.toLocaleTimeString()}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 font-mono text-sm">
+              <div className="flex items-center gap-2 text-cyan-500">
+                <Activity className="w-4 h-4" />
+                <span>SYSTEM_ONLINE</span>
+              </div>
+              <div className="flex items-center gap-2 text-purple-500">
+                <Lock className="w-4 h-4" />
+                <span>SECURE_CONNECTION</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and filters */}
+          <div className="flex gap-4 mb-8">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="SEARCH_RESOURCES::"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-900/50 border border-gray-800 rounded-lg px-4 py-3 pl-12 
+                         text-white focus:outline-none focus:border-cyan-500 font-mono"
+              />
+              <Search className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
+            </div>
+            <div className="flex gap-2">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-4 py-2 rounded-lg font-mono flex items-center gap-2 transition-colors
+                             ${activeCategory === category.id
+                               ? 'bg-cyan-500 text-white'
+                               : 'bg-gray-900/50 text-gray-400 hover:bg-gray-800'}`}
+                >
+                  <category.icon className="w-4 h-4" />
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Resources grid */}
+      <div className="container mx-auto px-4 pb-12">
+        <div className="grid md:grid-cols-2 gap-6">
+          {resources
+            .filter(resource => 
+              (activeCategory === 'all' || resource.category === activeCategory) &&
+              (searchQuery === '' || 
+               resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               resource.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+            )
+            .map((resource, index) => (
+              <ResourceCard key={index} resource={resource} />
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+const TeamPage = () => {
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [expandedCards, setExpandedCards] = useState({});
+  const [typingText, setTypingText] = useState({});
+
+  const teamMembers = [
+    {
+      name: 'Divyanshu Suman',
+      role: 'Manager',
+      icon: <UserCheck className="w-12 h-12 text-cyan-400" />,
+      bio: 'PhD in Computer Science with expertise in AI and ML. Leading technical initiatives and mentoring team members.',
+      skills: ['AI/ML', 'System Architecture', 'Team Leadership'],
+      achievements: ['Best Paper Award 2023', 'Tech Excellence Award'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['AI Research Lab', 'Cloud Infrastructure'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Shahu Patil', 
+      role: 'Manager',
+      icon: <Users className="w-12 h-12 text-cyan-400" />,
+      bio: 'Experienced project manager with a track record of successful tech project deliveries.',
+      skills: ['Project Management', 'Agile', 'Strategic Planning'],
+      achievements: ['PMI Certified', '15+ Successful Projects'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['DevOps Initiative', 'Team Expansion'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Veeraditya Karan Parakh',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
+      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/veeradi34',
+        twitter: 'https://www.instagram.com/veer3_1/',
+        linkedin: 'https://www.linkedin.com/in/veeraditya-karan-parakh-68a869282/'
+      },
+      projects: ['C4GT, ONDC', 'LearnerSpace ML and Hello FoSS ML Diffusivity'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Samarth Aggarwal',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Lopamudra Biswal',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
+      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '',
+        twitter: '#',
+        linkedin: 'http://linkedin.com/in/lopamudra-biswal-1a4266294'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Priyam Raj',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/Priyam12345-cloud',
+        twitter: 'https://www.instagram.com/priyamraj572/profilecard/?igsh=MnFpamY5M2o2eDMy',
+        linkedin: ' https://www.linkedin.com/in/priyam-raj-b4598a282?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Tushar Roy',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Param Pabari',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'http://www.linkedin.com/in/param-pabari',
+        twitter: 'https://www.instagram.com/param.svg/',
+        linkedin: 'http://www.linkedin.com/in/param-pabari'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Husain Batterywala',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: '#',
+        twitter: '#',
+        linkedin: '#'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Shresth Keshari',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/shresth-keshari',
+        twitter: 'https://www.instagram.com/social.lonewolf/profilecard/?igsh=MWlvdTA3b3NlcmN1Ng==',
+        linkedin: 'https://www.linkedin.com/in/shresth-keshari-626b2a267?fbclid=PAY2xjawHR2WNleHRuA2FlbQIxMQABprdnb6OIlAkXWDlyB5-p7GSVTfa63JNglAyQSse4Cpt4yOp4Md7k5T-qjw_aem_tq8epkqby1COBksqbqgSjw'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Pratyaksh Bharadwaj',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/Pratyaksh2309',
+        twitter: 'https://www.instagram.com/pratyaksh._.23?igsh=MXF4emhsaGQ4cXplZw==',
+        linkedin: 'https://www.linkedin.com/in/pratyaksh-bhardwaj-b2309ar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    },
+    {
+      name: 'Aryan Kayanade',
+      role: 'Convener',
+      icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
+      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
+      skills: ['Community Building', 'Event Management', 'Content Creation'],
+      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      social: {
+        github: 'https://github.com/TheDarKnight50',
+        twitter: '#',
+        linkedin: 'https://www.linkedin.com/in/aryan-kayande-6102a5284/'
+      },
+      projects: ['Tech Mentorship', 'Developer Relations'],
+      imageUrl: '/api/placeholder/400/400'
+    }
+  ];
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const simulateTyping = (memberId, text) => {
+    let currentText = '';
+    const words = ['> Loading profile...', '> Accessing database...', '> Decrypting data...', '> Display: OK'];
+    let wordIndex = 0;
+    let charIndex = 0;
+
+    const typeInterval = setInterval(() => {
+      if (wordIndex === words.length) {
+        clearInterval(typeInterval);
+        setExpandedCards(prev => ({ ...prev, [memberId]: true }));
+        setTypingText(prev => ({ ...prev, [memberId]: '' }));
+        return;
+      }
+
+      const currentWord = words[wordIndex];
+      if (charIndex === currentWord.length + 1) {
+        currentText += '\n';
+        wordIndex++;
+        charIndex = 0;
+      } else {
+        currentText = words.slice(0, wordIndex).join('\n') + '\n' + currentWord.slice(0, charIndex);
+        charIndex++;
+      }
+
+      setTypingText(prev => ({ ...prev, [memberId]: currentText }));
+    }, 50);
+  };
+
+  const MemberCard = ({ member, index }) => {
+    const isExpanded = expandedCards[index];
+    
+    return (
+      <Card className="relative overflow-hidden bg-gray-900/50 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20">
+        {/* Profile Section */}
+        <div className="p-6 space-y-6">
+          {/* Image and Basic Info */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden ring-2 ring-cyan-500/50">
+              <img 
+                src={member.imageUrl} 
+                alt={member.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">{member.name}</h3>
+              <p className="text-cyan-400">{member.role}</p>
+            </div>
+          </div>
+
+          {/* Bio */}
+          <p className="text-gray-300 text-sm">{member.bio}</p>
+
+          {/* Social Links */}
+          <div className="flex gap-4">
+            {member.social.github && (
+              <a 
+                href={member.social.github} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-5 h-5" />
+              </a>
+            )}
+            {member.social.twitter && (
+              <a 
+                href={member.social.twitter} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+            )}
+            {member.social.linkedin && (
+              <a 
+                href={member.social.linkedin} 
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            )}
+          </div>
+
+          {!isExpanded && (
+            <button 
+              onClick={() => {
+                simulateTyping(index, member.name);
+              }}
+              className="w-full bg-gray-800 text-cyan-400 px-4 py-2 rounded-md font-mono text-sm hover:bg-gray-700 transition-colors"
+            >
+              $ ./view-profile {member.name.toLowerCase().replace(' ', '-')}
+            </button>
+          )}
+        </div>
+
+        {/* Terminal Output */}
+        {typingText[index] && (
+          <div className="px-6 pb-4">
+            <pre className="font-mono text-xs text-cyan-400 whitespace-pre-wrap">
+              {typingText[index]}
+            </pre>
+          </div>
+        )}
+
+        {/* Details Section */}
+        <div className={`border-t border-cyan-500/20 transition-all duration-500 ${
+          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        } overflow-hidden`}>
+          <div className="p-6 space-y-6">
+            {/* Skills */}
+            <div>
+              <h4 className="text-sm font-semibold text-cyan-400 mb-3">Skills</h4>
+              <div className="flex flex-wrap gap-2">
+                {member.skills.map((skill, index) => (
+                  <span 
+                    key={index}
+                    className="bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded-md text-xs"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Projects */}
+            <div>
+              <h4 className="text-sm font-semibold text-cyan-400 mb-3">Projects</h4>
+              <div className="space-y-2">
+                {member.projects.map((project, index) => (
+                  <div 
+                    key={index}
+                    className="text-sm text-gray-300"
+                  >
+                    • {project}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* View Profile Button */}
+            <button 
+              onClick={() => setSelectedMember(member)}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+            >
+              View Full Profile
+            </button>
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+
+  return (
+    <div className="space-y-12 relative">
+      {/* Cursor gradient follow effect */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background: `radial-gradient(600px at ${cursorPos.x}px ${cursorPos.y}px, rgba(103, 232, 249, 0.15), transparent 80%)`
+        }}
+      />
+      
+      <div className="text-center relative">
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text mb-6">
+          Meet Our Team
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          The brilliant minds behind WnCC's success
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        {teamMembers.map((member, index) => (
+          <MemberCard key={index} member={member} />
+        ))}
+      </div>
+
+      {/* Selected member modal */}
+      {selectedMember && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-8 rounded-2xl max-w-2xl w-full mx-4 relative">
+            <button 
+              onClick={() => setSelectedMember(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex-shrink-0">
+                <div className="w-48 h-48 rounded-xl overflow-hidden">
+                  <img 
+                    src={selectedMember.imageUrl} 
+                    alt={selectedMember.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex-grow">
+                <div className="flex items-center gap-4 mb-4">
+                  {selectedMember.icon}
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{selectedMember.name}</h3>
+                    <p className="text-cyan-400">{selectedMember.role}</p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 mb-6">{selectedMember.bio}</p>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-3">Projects</h4>
+                    <ul className="space-y-2">
+                      {selectedMember.projects.map((project, index) => (
+                        <li key={index} className="text-gray-300">{project}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-3">Skills</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.skills.map((skill, index) => (
+                        <span 
+                          key={index}
+                          className="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-sm"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+const ContactPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      alert('Message sent successfully!');
+    }, 1000);
+  };
+
+  return (
+    <div className="space-y-12 relative">
+      <div className="text-center relative">
+        <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text mb-6">
+          Contact Us
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Have questions? We'd love to hear from you.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        <Card>
+          <h3 className="text-2xl font-bold text-cyan-400 mb-6">Get in Touch</h3>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-gray-300 mb-2">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Subject</label>
+              <input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                className="w-full bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-300 mb-2">Message</label>
+              <textarea
+                value={formData.message}
+                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                className="w-full h-32 bg-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-cyan-500 text-white py-3 rounded hover:bg-cyan-600 transition-all duration-300 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
+        </Card>
+
+        <div className="space-y-6">
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Visit Us</h3>
+            <p className="text-gray-300">
+              Web and Coding Club<br />
+              Student Activity Center<br />
+              IIT Bombay, Powai<br />
+              Mumbai - 400076
+            </p>
+          </Card>
+
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Contact Info</h3>
+            <div className="space-y-3">
+              <p className="text-gray-300">Email: wncc@iitb.ac.in</p>
+              <p className="text-gray-300">Phone: +91 7668192399/9146050850</p>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Follow Us</h3>
+            <div className="flex gap-4">
+              <a href="https://github.com/wncc" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Github className="w-6 h-6" />
+              </a>
+              <a href="https://www.instagram.com/wncc.iitb/" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Instagram className="w-6 h-6" />
+              </a>
+              <a href="https://www.linkedin.com/company/wncc-iitb/posts/?feedView=all" className="text-gray-300 hover:text-cyan-400 transition-colors">
+                <Linkedin className="w-6 h-6" />
+              </a>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const WebsitePreview = () => {
+  const [currentPage, setCurrentPage] = useState('Home');
+
+  const PageComponent = {
+    Home: HomePage,
+    Events: EventsPage,
+    Resources: ResourcesPage,
+    Team: TeamPage,
+    Contact: ContactPage
+  }[currentPage];
+
+  const quickLinks = [
+    { title: 'Documentation', url: '#' },
+    { title: 'Tutorials', url: '#' },
+    { title: 'Projects', url: '#' },
+    { title: 'Blog', url: '#' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <nav className="bg-gray-900/50 backdrop-blur-lg border-b border-cyan-500/20 p-4 sticky top-0 z-50">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="text-cyan-400 font-bold text-xl">WnCC IITB</div>
+          <div className="flex gap-6">
+            {['Home', 'Events', 'Resources', 'Team', 'Contact'].map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                  currentPage === page
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-gray-300 hover:text-cyan-400'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <main className="container mx-auto px-4 py-8">
+        <PageComponent />
+      </main>
+      
+      <footer className="bg-gray-900/50 backdrop-blur-lg border-t border-cyan-500/20 p-8 mt-16">
+        <div className="container mx-auto grid md:grid-cols-4 gap-8">
+         
+          
+          {/* Quick Links Section */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.url}
+                    className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Contact</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li>wncc@iitb.ac.in</li>
+              <li>Student Activity Center</li>
+              <li>IIT Bombay, Powai</li>
+              <li>Mumbai - 400076</li>
+            </ul>
+          </div>
+          
+          {/* Social Links */}
+          <div>
+            <h3 className="text-xl font-bold text-cyan-400 mb-4">Connect</h3>
+            <div className="flex gap-4">
+              <a href="https://github.com/wncc" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Github className="w-6 h-6" />
+              </a>
+              <a href="https://x.com/i/flow/login?redirect_after_login=%2Fwncc_iitb" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Twitter className="w-6 h-6" />
+              </a>
+              <a href="https://www.linkedin.com/company/wncc-iitb/posts/?feedView=all" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Linkedin className="w-6 h-6" />
+              </a>
+              <a href="https://www.instagram.com/wncc.iitb/" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Instagram className="w-6 h-6" />
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div className="container mx-auto mt-8 pt-8 border-t border-cyan-500/20 text-center">
+          <p className="text-gray-400">© 2024 Web and Coding Club, IIT Bombay. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default WebsitePreview;
