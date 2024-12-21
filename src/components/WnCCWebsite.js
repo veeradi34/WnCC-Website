@@ -39,6 +39,7 @@ import {
   Database,
   Code2,
   
+  
 } from 'lucide-react';
 
 
@@ -939,12 +940,7 @@ const ResourcesPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const categories = [
-    { id: 'all', name: 'ALL_RESOURCES', icon: BookOpen },
-    { id: 'tutorials', name: 'TUTORIALS.exe', icon: Code },
-    { id: 'courses', name: 'COURSES.sys', icon: Laptop },
-    { id: 'projects', name: 'PROJECTS.bin', icon: GitBranch }
-  ];
+  
 
   const resources = [
     {
@@ -1350,9 +1346,10 @@ const ResourcesPage = () => {
             </div>
           </div>
 
-          {/* Search and filters */}
-          <div className="flex gap-4 mb-8">
-            <div className="relative flex-1">
+          {/* Search and Category Filters */}
+          <div className="space-y-4 mb-8">
+            {/* Search Bar */}
+            <div className="relative">
               <input
                 type="text"
                 placeholder="SEARCH_RESOURCES::"
@@ -1363,26 +1360,16 @@ const ResourcesPage = () => {
               />
               <Search className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
             </div>
-            <div className="flex gap-2">
-              {categories.map(category => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg font-mono flex items-center gap-2 transition-colors
-                             ${activeCategory === category.id
-                               ? 'bg-cyan-500 text-white'
-                               : 'bg-gray-900/50 text-gray-400 hover:bg-gray-800'}`}
-                >
-                  <category.icon className="w-4 h-4" />
-                  {category.name}
-                </button>
-              ))}
+
+            {/* Category Buttons */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              
             </div>
           </div>
         </div>
       </div>
 
-      {/* Resources grid */}
+      {/* Resources Grid */}
       <div className="container mx-auto px-4 pb-12">
         <div className="grid md:grid-cols-2 gap-6">
           {resources
@@ -1400,6 +1387,22 @@ const ResourcesPage = () => {
     </div>
   );
 };
+
+const ChessIcon = () => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className="w-5 h-5"
+  >
+    <path d="M8 16L10.293 13.707C10.683 13.317 10.183 12.683 9.293 12.293L7 10C6.61 9.61 6.61 8.39 7 8L9.293 5.707C9.683 5.317 10.317 5.317 10.707 5.707L13 8C13.39 8.39 13.39 9.61 13 10L10.707 12.293C10.317 12.683 10.317 13.317 10.707 13.707L13 16" />
+    <path d="M16 8L13.707 10.293C13.317 10.683 13.817 11.317 14.707 11.707L17 14C17.39 14.39 17.39 15.61 17 16L14.707 18.293C14.317 18.683 13.683 18.683 13.293 18.293L11 16C10.61 15.61 10.61 14.39 11 14L13.293 11.707C13.683 11.317 13.683 10.683 13.293 10.293L11 8" />
+    <circle cx="12" cy="12" r="10" />
+  </svg>
+);
 const TeamPage = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -1411,181 +1414,197 @@ const TeamPage = () => {
       name: 'Divyanshu Suman',
       role: 'Manager',
       icon: <UserCheck className="w-12 h-12 text-cyan-400" />,
-      bio: 'PhD in Computer Science with expertise in AI and ML. Leading technical initiatives and mentoring team members.',
+      bio: '',
       skills: ['AI/ML', 'System Architecture', 'Team Leadership'],
-      achievements: ['Best Paper Award 2023', 'Tech Excellence Award'],
+      
       social: {
         github: '#',
         twitter: '#',
         linkedin: '#'
       },
-      projects: ['AI Research Lab', 'Cloud Infrastructure'],
+      
       imageUrl: 'Images/Divyanshu.jpg'
     },
     {
       name: 'Shahu Patil', 
       role: 'Manager',
       icon: <Users className="w-12 h-12 text-cyan-400" />,
-      bio: 'Experienced project manager with a track record of successful tech project deliveries.',
-      skills: ['Project Management', 'Agile', 'Strategic Planning'],
-      achievements: ['PMI Certified', '15+ Successful Projects'],
+      bio: '',
+      skills: ['ML (both CV, NLP)', 'App dev','Chess'],
+      
       social: {
-        github: '#',
-        twitter: '#',
-        linkedin: '#'
+        github: 'https://github.com/ShahuPatil07',
+        twitter: 'https://www.instagram.com/shahupatil07/',
+        linkedin: 'https://www.linkedin.com/in/shahu-patil-033a24279/'
       },
-      projects: ['DevOps Initiative', 'Team Expansion'],
-      imageUrl: "C:\Users\veers\wncc-website\Images\shahu.jpeg"
+      
+      imageUrl: 'Images/shahu.jpeg',
+      chess: {
+        rating: 1700,
+        lichessUsername: 'ShahuPatil07'
+      }
     },
     {
       name: 'Veeraditya Karan Parakh',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
-      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio: '',
+      skills: ['Machine Learning', 'Web-Dev', 'Data Science', 'Chess'],
+      
       social: {
         github: 'https://github.com/veeradi34',
         twitter: 'https://www.instagram.com/veer3_1/',
         linkedin: 'https://www.linkedin.com/in/veeraditya-karan-parakh-68a869282/'
       },
-      projects: ['C4GT, ONDC', 'LearnerSpace ML and Hello FoSS ML Diffusivity'],
-      imageUrl: './Images/IMG-20240422-WA0031.jpg'
+      
+      imageUrl: './Images/IMG-20240422-WA0031.jpg', 
+      chess: {
+        rating: 1850,
+        lichessUsername: 'veer3106'
+      }
     },
     {
       name: 'Samarth Aggarwal',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio: '',
+      skills: ['Machine Learning', 'Quant', 'Chess'],
+      
       social: {
-        github: '#',
-        twitter: '#',
-        linkedin: '#'
+        github: 'https://github.com/samarthagg1',
+        twitter: 'https://www.instagram.com/samarthagg1/',
+        linkedin: 'https://www.linkedin.com/in/samarth-aggarwal-1a9839284/'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
-      imageUrl: 'Images/samarth1.jpg'
+      
+      imageUrl: 'Images/samarth1.jpg',
+      chess: {
+        rating: 1050,
+        lichessUsername: 'veer3106'
+      }
     },
     {
       name: 'Lopamudra Biswal',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Software Enthusiast and Wannabe Coder. Passionate about sports and Video Games.',
-      skills: ['Machine Learning', 'Full-Stack Developer', 'Data Management'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Machine learning','Computer vision','RAG',],
+      
       social: {
-        github: '',
+        github: 'https://github.com/LoPA607',
         twitter: '#',
         linkedin: 'http://linkedin.com/in/lopamudra-biswal-1a4266294'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/Lopamudra.png'
     },
     {
       name: 'Priyam Raj',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Machine Learning ', 'Web Development', 'Django','QGIS', 'Postgresql'],
+      
       social: {
         github: 'https://github.com/Priyam12345-cloud',
         twitter: 'https://www.instagram.com/priyamraj572/profilecard/?igsh=MnFpamY5M2o2eDMy',
         linkedin: ' https://www.linkedin.com/in/priyam-raj-b4598a282?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/Priyam.jpg'
     },
     {
       name: 'Tushar Roy',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['MachineLearning','ComputerVision','RAG-LLM'],
+      
       social: {
-        github: '#',
+        github: 'https://github.com/tushroy81',
         twitter: '#',
         linkedin: '#'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/tushar.jpg'
     },
     {
       name: 'Param Pabari',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Machine Learning ','Django-REST','Solidity'],
+      
       social: {
         github: 'http://www.linkedin.com/in/param-pabari',
         twitter: 'https://www.instagram.com/param.svg/',
         linkedin: 'http://www.linkedin.com/in/param-pabari'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/Param.jpg'
     },
     {
       name: 'Husain Batterywala',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Competitive Programming','DSA','Parallel Programming','Linear Programming','Web Development','Machine Learning'],
+      
       social: {
-        github: '#',
-        twitter: '#',
-        linkedin: '#'
+        github: 'https://github.com/husain2088',
+        twitter: 'https://www.instagram.com/who_sane.9/',
+        linkedin: 'https://www.linkedin.com/in/husain-batterywala-113266282/'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/Husainsz1.jpg'
     },
     {
       name: 'Shresth Keshari',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Applied Machine Learning', 'Embedded Systems', 'Embedded C','C++','Django', 'React Js', 'NodeJs'],
+      
       social: {
         github: 'https://github.com/shresth-keshari',
         twitter: 'https://www.instagram.com/social.lonewolf/profilecard/?igsh=MWlvdTA3b3NlcmN1Ng==',
         linkedin: 'https://www.linkedin.com/in/shresth-keshari-626b2a267?fbclid=PAY2xjawHR2WNleHRuA2FlbQIxMQABprdnb6OIlAkXWDlyB5-p7GSVTfa63JNglAyQSse4Cpt4yOp4Md7k5T-qjw_aem_tq8epkqby1COBksqbqgSjw'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/shresthk.jpg'
     },
     {
       name: 'Pratyaksh Bharadwaj',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Machine Learning ','Web-Dev'],
+      
       social: {
         github: 'https://github.com/Pratyaksh2309',
         twitter: 'https://www.instagram.com/pratyaksh._.23?igsh=MXF4emhsaGQ4cXplZw==',
         linkedin: 'https://www.linkedin.com/in/pratyaksh-bhardwaj-b2309ar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
+      
       imageUrl: 'Images/Pratyaksh.jpg'
     },
     {
       name: 'Aryan Kayanade',
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-      bio: 'Community builder and tech evangelist. Passionate about creating inclusive tech spaces.',
-      skills: ['Community Building', 'Event Management', 'Content Creation'],
-      achievements: ['Community Growth 200%', 'Event of the Year 2023'],
+      bio:'',
+      skills: ['Machine Learning ','Deep Learning','Computer Vision'],
+      
       social: {
         github: 'https://github.com/TheDarKnight50',
         twitter: '#',
         linkedin: 'https://www.linkedin.com/in/aryan-kayande-6102a5284/'
       },
-      projects: ['Tech Mentorship', 'Developer Relations'],
-      imageUrl: 'Images/Aryan.jpg'
+      
+      imageUrl: 'Images/Aryan.jpg',
+      chess: {
+        rating: 1750,
+        lichessUsername: 'TheDarkKinght_50'
+      }
     }
   ];
 
@@ -1623,8 +1642,26 @@ const TeamPage = () => {
       }
 
       setTypingText(prev => ({ ...prev, [memberId]: currentText }));
-    }, 50);
+    }, 1);
   };
+
+  const ChessChallenge = ({ username, rating }) => (
+    <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-cyan-500/20">
+      <div className="flex items-center gap-3 mb-3">
+        <ChessIcon className="w-5 h-5 text-cyan-400" />
+        <span className="text-white font-medium">Chess Rating: {rating}</span>
+      </div>
+      <a
+        href={`https://lichess.org/?user=${username}#friend`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+      >
+        <ChessIcon className="w-4 h-4" />
+        Challenge to Chess
+      </a>
+    </div>
+  );
 
   const MemberCard = ({ member, index }) => {
     const isExpanded = expandedCards[index];
@@ -1711,6 +1748,12 @@ const TeamPage = () => {
           isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         } overflow-hidden`}>
           <div className="p-6 space-y-6">
+            {/* Bio */}
+            <div>
+              <h4 className="text-sm font-semibold text-cyan-400 mb-3">About</h4>
+              <p className="text-gray-300 text-sm">{member.bio}</p>
+            </div>
+
             {/* Skills */}
             <div>
               <h4 className="text-sm font-semibold text-cyan-400 mb-3">Skills</h4>
@@ -1722,21 +1765,6 @@ const TeamPage = () => {
                   >
                     {skill}
                   </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Projects */}
-            <div>
-              <h4 className="text-sm font-semibold text-cyan-400 mb-3">Projects</h4>
-              <div className="space-y-2">
-                {member.projects.map((project, index) => (
-                  <div 
-                    key={index}
-                    className="text-sm text-gray-300"
-                  >
-                    • {project}
-                  </div>
                 ))}
               </div>
             </div>
@@ -1753,7 +1781,6 @@ const TeamPage = () => {
       </Card>
     );
   };
-
 
   return (
     <div className="space-y-12 relative">
@@ -1776,7 +1803,7 @@ const TeamPage = () => {
 
       <div className="grid md:grid-cols-3 gap-8">
         {teamMembers.map((member, index) => (
-          <MemberCard key={index} member={member} />
+          <MemberCard key={index} member={member} index={index} />
         ))}
       </div>
 
@@ -1813,30 +1840,28 @@ const TeamPage = () => {
                 
                 <p className="text-gray-300 mb-6">{selectedMember.bio}</p>
                 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-3">Projects</h4>
-                    <ul className="space-y-2">
-                      {selectedMember.projects.map((project, index) => (
-                        <li key={index} className="text-gray-300">{project}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-3">Skills</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember.skills.map((skill, index) => (
-                        <span 
-                          key={index}
-                          className="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-3">Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMember.skills.map((skill, index) => (
+                      <span 
+                        key={index}
+                        className="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-sm"
+                      >
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 </div>
+
+                {selectedMember.chess && (
+                  <div className="mt-6">
+                    <ChessChallenge 
+                      username={selectedMember.chess.lichessUsername} 
+                      rating={selectedMember.chess.rating}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -2123,6 +2148,7 @@ const WebsitePreview = () => {
                 <Instagram className="w-6 h-6" />
               </a>
             </div>
+            
           </div>
         </div>
         
