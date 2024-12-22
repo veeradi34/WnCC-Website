@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,useCallback } from 'react';
 
 
 import { 
@@ -38,9 +38,12 @@ import {
   Terminal,
   Database,
   Code2,
+  Link
+  
   
   
 } from 'lucide-react';
+import axios from 'axios';
 
 
 // Card component for consistent styling
@@ -64,33 +67,148 @@ const generateCalendarUrl = (event) => {
 };
 const TechNewsFeed = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const news = [
-    {
-      title: "V2A: Google DeepMind's New AI Model",
-      date: "Latest News",
-      category: "AI",
-      description: "Google DeepMind introduces V2A, a groundbreaking AI model capable of generating dialogue and soundtracks for videos, pushing the boundaries of audio-visual AI technology."
-    },
-    {
-      title: "ChatGPT Launches WhatsApp Hotline",
-      date: "Breaking News",
-      category: "AI Services",
-      description: "OpenAI introduces 1800-ChatGPT, a new hotline feature available on WhatsApp for chat and calls. Users can access the service free for the first 15 minutes."
-    },
-    {
-      title: "Laser Beams Cast Their Own Shadows",
-      date: "Scientific Discovery",
-      category: "Physics",
-      description: "In a fascinating scientific breakthrough, researchers have discovered that laser beams possess the capability to cast their own shadows, challenging our understanding of light behavior."
-    }
-  ];
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchAndCacheNews = async () => {
+      try {
+        // Check if we have cached news and if it's still valid (less than 24 hours old)
+        const cachedData = localStorage.getItem('techNewsCache');
+        const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
+        const now = new Date().getTime();
+
+        if (cachedData && cachedTimestamp) {
+          const timeDiff = now - parseInt(cachedTimestamp);
+          const hoursElapsed = timeDiff / (1000 * 60 * 60);
+
+          // If cache is less than 24 hours old, use it
+          if (hoursElapsed < 24) {
+            setNews(JSON.parse(cachedData));
+            setLoading(false);
+            return;
+          }
+        }
+
+        // If no cache or cache is old, fetch new data
+        const response = await axios.get(
+          'https://gnews.io/api/v4/search', {
+            params: {
+              q: 'technology',
+              lang: 'en',
+              country: 'us',
+              max: 10,
+              apikey: 'd506df354490ba89a3d579e4d84dd826'
+            }
+          }
+        );
+
+        const formattedNews = response.data.articles.map(article => ({
+          title: article.title,
+          date: new Date(article.publishedAt).toLocaleDateString(),
+          category: 'Tech',
+          description: article.description,
+          url: article.url
+        }));
+
+        // Cache the new data
+        localStorage.setItem('techNewsCache', JSON.stringify(formattedNews));
+        localStorage.setItem('techNewsCacheTimestamp', now.toString());
+
+        setNews(formattedNews);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching news:', err);
+        setError('Failed to fetch news');
+        setLoading(false);
+
+        // Try to use cached data even if it's old when API fails
+        const cachedData = localStorage.getItem('techNewsCache');
+        if (cachedData) {
+          setNews(JSON.parse(cachedData));
+        } else {
+          // Fallback to sample news if no cache and API fails
+          setNews([
+            {
+              title: "Error fetching live news",
+              date: "Now",
+              category: "System",
+              description: "Please check your API key and connection. Displaying sample news as fallback.",
+              url: "#"
+            }
+          ]);
+        }
+      }
+    };
+
+    fetchAndCacheNews();
+
+    // Set up periodic check for cache age
+    const checkCacheInterval = setInterval(() => {
+      const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
+      const now = new Date().getTime();
+
+      if (cachedTimestamp) {
+        const timeDiff = now - parseInt(cachedTimestamp);
+        const hoursElapsed = timeDiff / (1000 * 60 * 60);
+
+        // If cache is more than 24 hours old, fetch new data
+        if (hoursElapsed >= 24) {
+          fetchAndCacheNews();
+        }
+      }
+    }, 1000 * 60 * 60); // Check every hour
+
+    // Also check when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
+        const now = new Date().getTime();
+
+        if (cachedTimestamp) {
+          const timeDiff = now - parseInt(cachedTimestamp);
+          const hoursElapsed = timeDiff / (1000 * 60 * 60);
+
+          if (hoursElapsed >= 24) {
+            fetchAndCacheNews();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      clearInterval(checkCacheInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (news.length === 0) return;
+    
     const timer = setInterval(() => {
       setActiveIndex((current) => (current + 1) % news.length);
     }, 5000);
+    
     return () => clearInterval(timer);
-  }, []);
+  }, [news.length]);
+
+  const handleReadMore = (url) => {
+    window.open(url, '_blank');
+  };
+
+  if (loading) {
+    return (
+      <Card className="p-6 bg-gray-900/50 backdrop-blur border-cyan-500/20">
+        <div className="flex items-center justify-center h-48">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 bg-gray-900/50 backdrop-blur border-cyan-500/20">
@@ -113,8 +231,11 @@ const TechNewsFeed = () => {
             </span>
             <h4 className="text-lg font-semibold text-white mt-2 mb-1">{item.title}</h4>
             <p className="text-gray-400 text-sm mb-2">{item.date}</p>
-            <p className="text-gray-300">{item.description}</p>
-            <button className="mt-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+            <p className="text-gray-300 line-clamp-2">{item.description}</p>
+            <button 
+              onClick={() => handleReadMore(item.url)}
+              className="mt-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
               Read More <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -136,6 +257,7 @@ const TechNewsFeed = () => {
     </Card>
   );
 };
+
 const ParticleEffect = () => {
   const canvasRef = useRef(null);
 
@@ -484,95 +606,265 @@ const RiddleGame = () => {
     {
       question: "In a sorted array of n distinct integers, if array[index] = index for some index, this index is called a magic index. For array [-5,-3,0,3,7], what's the magic index?",
       answer: "3"
+    },
+    {
+      question: "How many squares (of any size) are there on a standard 8x8 chessboard?",
+      answer: "204"
+    },
+    {
+      question: "A 4-digit perfect square reads the same forwards and backwards. What is it?",
+      answer: "9009"
+    },
+    {
+      question: "What's the sum of angles in a regular pentagon? (in degrees)",
+      answer: "540"
+    },
+    {
+      question: "If you roll two fair six-sided dice, what's the probability of getting a sum of 7? (Answer as a percentage)",
+      answer: "17"
+    },
+    {
+      question: "In how many ways can you arrange the letters of the word 'BUBBLE'?",
+      answer: "60"
+    },
+    {
+      question: "A train travels 60 miles per hour. How far will it travel in 150 minutes? (in miles)",
+      answer: "150"
+    },
+    {
+      question: "What's the smallest number that when multiplied by 3 becomes a number with all digits being 1?",
+      answer: "37037"
+    },
+    {
+      question: "On a 4x4 grid, how many different rectangles can be formed? (including squares)",
+      answer: "100"
+    },
+    {
+      question: "How many prime numbers are there between 1 and 50?",
+      answer: "15"
+    },
+    {
+      question: "What's the remainder when 2^100 is divided by 5?",
+      answer: "1"
+    },
+    {
+      question: "In base 3, what is 101 equal to in base 10?",
+      answer: "10"
+    },
+    {
+      question: "A clock shows 3:15. What is the angle between the hour and minute hands? (in degrees)",
+      answer: "7.5"
+    },
+    {
+      question: "How many different ways can you arrange 4 red balls and 3 blue balls in a line?",
+      answer: "35"
+    },
+    {
+      question: "What's the largest possible product of two numbers whose sum is 100?",
+      answer: "2500"
+    },
+    {
+      question: "In a standard deck of 52 cards, what's the probability of drawing a face card or an ace? (Answer as percentage)",
+      answer: "31"
     }
-  ];
+];
 
-  const [currentRiddle, setCurrentRiddle] = useState(riddles[0]);
-  const [userAnswer, setUserAnswer] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [streak, setStreak] = useState(0);
-  const [usedRiddles, setUsedRiddles] = useState(new Set([0]));
-  const [showHint, setShowHint] = useState(false);
-
-  const getNextRiddle = () => {
-    let availableIndices = Array.from({ length: riddles.length }, (_, i) => i)
-      .filter(i => !usedRiddles.has(i));
-    
-    if (availableIndices.length === 0) {
-      setUsedRiddles(new Set([0]));
-      availableIndices = Array.from({ length: riddles.length }, (_, i) => i);
+const initializeGameState = () => {
+  try {
+    const savedData = localStorage.getItem('riddleGameData');
+    if (savedData) {
+      const { streak, lastUpdated, usedRiddleIndices, currentRiddleIndex } = JSON.parse(savedData);
+      const now = new Date().getTime();
+      const hoursSinceLastUpdate = (now - lastUpdated) / (1000 * 60 * 60);
+      
+      // Reset everything if 24 hours have passed
+      if (hoursSinceLastUpdate >= 24) {
+        return {
+          streak: 0,
+          usedRiddles: new Set([0]),
+          currentRiddle: riddles[0]
+        };
+      }
+      
+      // Ensure currentRiddleIndex is valid
+      const validIndex = currentRiddleIndex >= 0 && currentRiddleIndex < riddles.length 
+        ? currentRiddleIndex 
+        : 0;
+      
+      return {
+        streak,
+        usedRiddles: new Set(usedRiddleIndices),
+        currentRiddle: riddles[validIndex]
+      };
     }
+  } catch (error) {
+    console.error('Error initializing game state:', error);
+  }
+  
+  // Default initial state
+  return {
+    streak: 0,
+    usedRiddles: new Set([0]),
+    currentRiddle: riddles[0]
+  };
+};
 
-    const nextIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-    setCurrentRiddle(riddles[nextIndex]);
-    setUsedRiddles(prev => new Set([...prev, nextIndex]));
+const initialState = initializeGameState();
+const [currentRiddle, setCurrentRiddle] = useState(() => riddles[0]); // Ensure default value
+const [userAnswer, setUserAnswer] = useState('');
+const [feedback, setFeedback] = useState('');
+const [streak, setStreak] = useState(initialState.streak);
+const [usedRiddles, setUsedRiddles] = useState(initialState.usedRiddles);
+const [showHint, setShowHint] = useState(false);
+
+// Set initial riddle after component mounts
+useEffect(() => {
+  setCurrentRiddle(initialState.currentRiddle);
+}, []);
+
+// Save game state whenever relevant state changes
+useEffect(() => {
+  if (!currentRiddle) return; // Guard against undefined currentRiddle
+  
+  const currentRiddleIndex = riddles.findIndex(r => r.question === currentRiddle.question);
+  const saveData = {
+    streak,
+    lastUpdated: new Date().getTime(),
+    usedRiddleIndices: Array.from(usedRiddles),
+    currentRiddleIndex: currentRiddleIndex >= 0 ? currentRiddleIndex : 0
+  };
+  
+  try {
+    localStorage.setItem('riddleGameData', JSON.stringify(saveData));
+  } catch (error) {
+    console.error('Error saving game state:', error);
+  }
+}, [streak, usedRiddles, currentRiddle]);
+
+const getNextRiddle = useCallback(() => {
+  let availableIndices = Array.from({ length: riddles.length }, (_, i) => i)
+    .filter(i => !usedRiddles.has(i));
+  
+  if (availableIndices.length === 0) {
+    setUsedRiddles(new Set([0]));
+    availableIndices = Array.from({ length: riddles.length }, (_, i) => i);
+  }
+
+  const nextIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  setCurrentRiddle(riddles[nextIndex]);
+  setUsedRiddles(prev => new Set([...prev, nextIndex]));
+  setShowHint(false);
+}, [usedRiddles]);
+
+// Check for 24-hour reset
+useEffect(() => {
+  const checkReset = () => {
+    try {
+      const savedData = localStorage.getItem('riddleGameData');
+      if (savedData) {
+        const { lastUpdated } = JSON.parse(savedData);
+        const now = new Date().getTime();
+        const hoursSinceLastUpdate = (now - lastUpdated) / (1000 * 60 * 60);
+        
+        if (hoursSinceLastUpdate >= 24) {
+          setStreak(0);
+          setUsedRiddles(new Set([0]));
+          setCurrentRiddle(riddles[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking reset:', error);
+    }
+  };
+
+  checkReset();
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      checkReset();
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  const interval = setInterval(checkReset, 60000);
+
+  return () => {
+    clearInterval(interval);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, []);
+
+const checkAnswer = useCallback(() => {
+  if (userAnswer.toLowerCase().trim() === currentRiddle.answer.toLowerCase()) {
+    const newStreak = streak + 1;
+    setStreak(newStreak);
+    setFeedback('Correct! 🎉 Get ready for the next question...');
+    setUserAnswer('');
     setShowHint(false);
-  };
+    setTimeout(() => {
+      setFeedback('');
+      getNextRiddle();
+    }, 2000);
+  } else {
+    setFeedback('Incorrect! Try again 💡');
+    setStreak(0);
+    setUsedRiddles(new Set([riddles.findIndex(r => r.question === currentRiddle.question)]));
+  }
+}, [userAnswer, currentRiddle, streak, getNextRiddle]);
 
-  const checkAnswer = () => {
-    if (userAnswer.toLowerCase().trim() === currentRiddle.answer.toLowerCase()) {
-      setStreak(prev => prev + 1);
-      setFeedback('Correct! 🎉 Get ready for the next question...');
-      setUserAnswer('');
-      setShowHint(false);
-      setTimeout(() => {
-        setFeedback('');
-        getNextRiddle();
-      }, 2000);
-    } else {
-      setFeedback('Incorrect! Try again 💡');
-      setStreak(0);
-    }
-  };
+if (!currentRiddle) {
+  return <div>Loading...</div>; // Add loading state
+}
 
-  return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-cyan-400">Coding Interview Practice</h3>
-        <div className="flex gap-4 items-center">
-          <span className="bg-cyan-500/20 px-3 py-1 rounded-full text-cyan-400">
-            Streak: {streak} 🔥
-          </span>
-          <button
-            onClick={() => {
-              setStreak(0);
-              setUserAnswer('');
-              setFeedback('');
-              setShowHint(false);
-              getNextRiddle();
-            }}
-            className="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded-full transition-colors"
-          >
-            Skip
-          </button>
-        </div>
-      </div>
-      <div className="bg-gray-800 p-4 rounded-lg mb-6">
-        <p className="text-lg text-gray-200">{currentRiddle.question}</p>
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={userAnswer}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
-          className="flex-1 bg-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          placeholder="Your answer..."
-        />
+return (
+  <Card className="p-6">
+    <div className="flex items-center justify-between mb-6">
+      <h3 className="text-xl font-bold text-cyan-400">Coding Interview Practice</h3>
+      <div className="flex gap-4 items-center">
+        <span className="bg-cyan-500/20 px-3 py-1 rounded-full text-cyan-400">
+          Streak: {streak} 🔥
+        </span>
         <button
-          onClick={checkAnswer}
-          className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
+          onClick={() => {
+            setStreak(0);
+            setUserAnswer('');
+            setFeedback('');
+            setShowHint(false);
+            setUsedRiddles(new Set([0]));
+            getNextRiddle();
+          }}
+          className="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded-full transition-colors"
         >
-          Submit
+          Skip
         </button>
       </div>
-      {feedback && (
-        <div className={`mt-4 text-center ${feedback.includes('Correct') ? 'text-green-400' : 'text-cyan-400'}`}>
-          {feedback}
-        </div>
-      )}
-    </Card>
-  );
+    </div>
+    <div className="bg-gray-800 p-4 rounded-lg mb-6">
+      <p className="text-lg text-gray-200">{currentRiddle.question}</p>
+    </div>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={userAnswer}
+        onChange={(e) => setUserAnswer(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
+        className="flex-1 bg-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        placeholder="Your answer..."
+      />
+      <button
+        onClick={checkAnswer}
+        className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
+      >
+        Submit
+      </button>
+    </div>
+    {feedback && (
+      <div className={`mt-4 text-center ${feedback.includes('Correct') ? 'text-green-400' : 'text-cyan-400'}`}>
+        {feedback}
+      </div>
+    )}
+  </Card>
+);
 };
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <Card className="text-center">
@@ -603,7 +895,7 @@ const AboutUs = () => (
       <Card>
         <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Vision</h3>
         <p className="text-gray-300">
-        Create an inclusive environment where students collaborate, innovate, and grow together as problem-solvers and developers.
+        Bridging the gap between beginners and professionals and creating an inclusive environment where students collaborate, innovate, and grow together as problem-solvers and developers. 
         </p>
       </Card>
     </div>
@@ -2066,10 +2358,9 @@ const WebsitePreview = () => {
   }[currentPage];
 
   const quickLinks = [
-    { title: 'Documentation', url: '#' },
-    { title: 'Tutorials', url: '#' },
-    { title: 'Projects', url: '#' },
-    { title: 'Blog', url: '#' }
+    { title: 'Contact Us', url: ''},
+    { title: 'Projects', url: 'https://github.com/orgs/wncc/repositories' },
+    { title: 'Blog', url: 'https://www.technewsworld.com/section/tech-blog' }
   ];
 
   return (
@@ -2101,7 +2392,6 @@ const WebsitePreview = () => {
       
       <footer className="bg-gray-900/50 backdrop-blur-lg border-t border-cyan-500/20 p-8 mt-16">
         <div className="container mx-auto grid md:grid-cols-4 gap-8">
-         
           
           {/* Quick Links Section */}
           <div>
@@ -2147,8 +2437,10 @@ const WebsitePreview = () => {
               <a href="https://www.instagram.com/wncc.iitb/" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
                 <Instagram className="w-6 h-6" />
               </a>
+              <a href="https://linktr.ee/wncciitb" className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <Link className="w-6 h-6" />
+              </a>
             </div>
-            
           </div>
         </div>
         
