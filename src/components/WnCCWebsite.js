@@ -1722,7 +1722,7 @@ const TeamPage = () => {
       role: 'Manager',
       icon: <Users className="w-12 h-12 text-cyan-400" />,
       bio: '',
-      skills: ['ML (both CV, NLP)', 'App dev','Chess'],
+      skills: ['AI/ML', 'App dev','Chess'],
       
       social: {
         github: 'https://github.com/ShahuPatil07',
@@ -1741,7 +1741,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio: '',
-      skills: ['Machine Learning', 'Web-Dev', 'Data Science', 'Chess'],
+      skills: ['AI/ML', 'Web-Dev', 'Data Science', 'Chess'],
       
       social: {
         github: 'https://github.com/veeradi34',
@@ -1760,7 +1760,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio: '',
-      skills: ['Machine Learning', 'Quant', 'Chess'],
+      skills: ['AI/ML', 'Quant', 'Chess'],
       
       social: {
         github: 'https://github.com/samarthagg1',
@@ -1779,7 +1779,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['Machine learning','Computer vision','RAG',],
+      skills: ['AI/ML','RAG',],
       
       social: {
         github: 'https://github.com/LoPA607',
@@ -1794,7 +1794,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['Machine Learning ', 'Web Development', 'Django','QGIS', 'Postgresql'],
+      skills: ['AI/ML ', 'Web Development','QGIS', 'Postgresql'],
       
       social: {
         github: 'https://github.com/Priyam12345-cloud',
@@ -1809,7 +1809,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['MachineLearning','ComputerVision','RAG-LLM'],
+      skills: ['AI/ML','RAG-LLM'],
       
       social: {
         github: 'https://github.com/tushroy81',
@@ -1824,7 +1824,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['Machine Learning ','Django-REST','Solidity'],
+      skills: ['AI/ML','Django-REST','Solidity'],
       
       social: {
         github: 'http://www.linkedin.com/in/param-pabari',
@@ -1839,7 +1839,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['Competitive Programming','DSA','Parallel Programming','Linear Programming','Web Development','Machine Learning'],
+      skills: ['Competitive Programming','DSA','Parallel Programming','Linear Programming','Web Development','AI/ML'],
       
       social: {
         github: 'https://github.com/husain2088',
@@ -1869,7 +1869,7 @@ const TeamPage = () => {
       role: 'Convener',
       icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
       bio:'',
-      skills: ['Machine Learning ','Web-Dev'],
+      skills: ['AI/ML','Web-Dev'],
       
       social: {
         github: 'https://github.com/Pratyaksh2309',
