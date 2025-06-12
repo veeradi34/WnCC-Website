@@ -400,9 +400,9 @@ const LiveCodeEditor = () => {
 // Activity Feed component for HomePage
 const ActivityFeed = () => {
   const activities = [
-    { text: "Seasons of Code Begins", time: " 21 May" },
+    { text: "Seasons of Code Begins", time: " 21st May" },
     { text: "Launch of DSA Bootcamp", time: "1st June" },
-    { text: "Kickoff of the Learners’ Space", time: "9 June" }
+    { text: "Kickoff of the Learners’ Space", time: "9th June" }
 
 
   ];
