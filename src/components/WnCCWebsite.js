@@ -1549,7 +1549,7 @@ const TeamPage = () => {
             },
         },
         {
-            name: "Pratyaksh Bharadwaj",
+            name: "Pratyaksh Bhardwaj",
             role: "Manager",
             icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
             bio: "Hello everyone! I'm Pratyaksh Bhardwaj, a third-year B.Tech student at IIT Bombay, majoring in Metallurgy and Material Science with a minor in Data Science. I'm currently the Manager of the Web and Coding Club, where I lead projects, conduct sessions, and mentor my convenors across various domains.\n\nI'm an enthusiastic coder and was part of the Inter-IIT Tech Contingent in my second year. Outside of tech, I enjoy playing basketball, badminton, and spending time with friends.",
