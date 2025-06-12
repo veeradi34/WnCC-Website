@@ -2184,7 +2184,8 @@ const ContactPage = () => {
                         </h3>
                         <div className="space-y-3 font-mono">
                             <p className="text-gray-300">email: wncc@iitb.ac.in</p>
-                            <p className="text-gray-300">phone: +91 9662201929/9449007525</p>
+                            <p className="text-gray-300">managers: Veeraditya Karan Parakh , Pratyaksh Bhardwaj</p>
+                            <p className="text-gray-300">phone: +91 9449007525/9662201929</p>
                         </div>
                     </Card>
 
