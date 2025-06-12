@@ -527,7 +527,7 @@ const LiveCodeEditor = () => {
 // Activity Feed component for HomePage
 const ActivityFeed = () => {
     const activities = [
-        { text: "Season of Code Begins", time: " 21 May" },
+        { text: "Seasons of Code Begins", time: " 21 May" },
         { text: "Launch of DSA Bootcamp", time: "1st June" },
         { text: "Kickoff of the Learners’ Space", time: "9 June" }
 
@@ -1552,7 +1552,7 @@ const TeamPage = () => {
             name: "Pratyaksh Bhardwaj",
             role: "Manager",
             icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-            bio: "Hello everyone! I'm Pratyaksh Bhardwaj, a third-year B.Tech student at IIT Bombay, majoring in Metallurgy and Material Science with a minor in Data Science. I'm currently the Manager of the Web and Coding Club, where I lead projects, conduct sessions, and mentor my convenors across various domains.\n\nI'm an enthusiastic coder and was part of the Inter-IIT Tech Contingent in my second year. Outside of tech, I enjoy playing basketball, badminton, and spending time with friends.",
+            bio: "Hello everyone! I'm Pratyaksh Bhardwaj, a third-year B.Tech student at IIT Bombay, majoring in Metallurgy and Material Science with a minor in Data Science. I'm currently the Manager of the Web and Coding Club, where I lead projects, conduct sessions, and mentor my conveners across various domains.\n\nI'm an enthusiastic coder and was part of the Inter-IIT Tech Contingent in my second year. Outside of tech, I enjoy playing basketball, badminton, and spending time with friends.",
             skills: [
                 "Machine Learning ",
                 "Web-Dev",
@@ -1652,7 +1652,7 @@ const TeamPage = () => {
             name: "Utkarsh Tanwar",
             role: "Convener",
             icon: <MessageCircle className="w-12 h-12 text-cyan-400" />,
-            bio: "Hello everyone! I'm Utkarsh Tanwar,a second-year B.Tech student at IIT Bombayr of the Web and Coding Club, where I contribute to club initiatives, coordinate sessions, and work on exciting tech projects with fellow enthusiasts.\n\nOutside the world of coding, I love swimming, reading, playing badminton and tennis, and trekking through nature. I'm always eager to explore new places and experience the beauty the world has to offer.\n\nLooking forward to connecting and learning together.",
+            bio: "Hello everyone! I'm Utkarsh Tanwar,a second-year B.Tech student at IIT Bombay of the Web and Coding Club, where I contribute to club initiatives, coordinate sessions, and work on exciting tech projects with fellow enthusiasts.\n\nOutside the world of coding, I love swimming, reading, playing badminton and tennis, and trekking through nature. I'm always eager to explore new places and experience the beauty the world has to offer.\n\nLooking forward to connecting and learning together.",
             skills: [
                 "Python",
                 "C++",
@@ -1727,7 +1727,7 @@ const TeamPage = () => {
                 linkedin: "https://www.linkedin.com/in/sarthak-somani/",
                 instagram: ""
             },
-            imageUrl: "./Images/SHARTHAK.png",
+            imageUrl: "./Images/SARTHAK.png",
         }];
 
     useEffect(() => {
