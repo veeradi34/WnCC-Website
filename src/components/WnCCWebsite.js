@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import ParticleEffect from "./common/ParticleEffect";
+import Navbar from "./layout/Navbar";
+import Footer from "./layout/Footer";
+import HelloFOSS from "./pages/HelloFOSS";
+import Card from "./common/Card";
+import TechNewsFeed from "./common/TechNewsFeed";
 
+// Import all the required icons
 import {
     Code,
     Laptop,
@@ -7,28 +14,19 @@ import {
     GitBranch,
     Trophy,
     Star,
-    Sparkles,
     Users,
     Calendar,
     Lightbulb,
-    BookOpen,
-    UserCheck,
     MessageCircle,
     Github,
     Twitter,
     Linkedin,
     Activity,
     Instagram,
-    Award,
     Zap,
     Brain,
     Globe,
-    MousePointer,
-    Sparkles as SparklesIcon,
-    X,
     Search,
-    Newspaper,
-    ArrowRight,
     Braces,
     Lock,
     Smartphone,
@@ -37,283 +35,16 @@ import {
     Terminal,
     Database,
     Code2,
-    Link
+    X
 } from "lucide-react";
 
-import axios from 'axios';
+// Import original components for other pages
+import { 
+    WebsitePreviewComponents 
+} from './WnCCWebsiteOriginal';
 
-// Card component for consistent styling
-const Card = ({ children, className = "", onMouseEnter, onMouseLeave }) => (
-    <div
-        className={`bg-gray-800/50 backdrop-blur p-6 rounded-xl border border-cyan-500/20 transition-all duration-300 hover:shadow-lg hover:border-cyan-500/40 ${className}`}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-    >
-        {children}
-    </div>
-);
-const generateCalendarUrl = (event) => {
-    const encodedText = encodeURIComponent(event.title);
-    const encodedDetails = encodeURIComponent(event.description);
-    const encodedLocation = encodeURIComponent(event.location);
-    const startDate = new Date(event.date)
-        .toISOString()
-        .replace(/-|:|\.\d\d\d/g, "");
-    const endDate = new Date(event.endDate)
-        .toISOString()
-        .replace(/-|:|\.\d\d\d/g, "");
-
-    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodedText}&details=${encodedDetails}&location=${encodedLocation}&dates=${startDate}/${endDate}`;
-};
-const TechNewsFeed = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [news, setNews] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchAndCacheNews = async () => {
-            try {
-                // Check if we have cached news and if it's still valid (less than 24 hours old)
-                const cachedData = localStorage.getItem('techNewsCache');
-                const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
-                const now = new Date().getTime();
-
-                if (cachedData && cachedTimestamp) {
-                    const timeDiff = now - parseInt(cachedTimestamp);
-                    const hoursElapsed = timeDiff / (1000 * 60 * 60);
-
-                    // If cache is less than 24 hours old, use it
-                    if (hoursElapsed < 24) {
-                        setNews(JSON.parse(cachedData));
-                        setLoading(false);
-                        return;
-                    }
-                }
-
-                // If no cache or cache is old, fetch new data
-                const response = await axios.get(
-                    'https://gnews.io/api/v4/search', {
-                    params: {
-                        q: 'technology',
-                        lang: 'en',
-                        country: 'us',
-                        max: 10,
-                        apikey: 'd506df354490ba89a3d579e4d84dd826'
-                    }
-                }
-                );
-
-                const formattedNews = response.data.articles.map(article => ({
-                    title: article.title,
-                    date: new Date(article.publishedAt).toLocaleDateString(),
-                    category: 'Tech',
-                    description: article.description,
-                    url: article.url
-                }));
-
-                // Cache the new data
-                localStorage.setItem('techNewsCache', JSON.stringify(formattedNews));
-                localStorage.setItem('techNewsCacheTimestamp', now.toString());
-
-                setNews(formattedNews);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching news:', err);
-                setError('Failed to fetch news');
-                setLoading(false);
-
-                // Try to use cached data even if it's old when API fails
-                const cachedData = localStorage.getItem('techNewsCache');
-                if (cachedData) {
-                    setNews(JSON.parse(cachedData));
-                } else {
-                    // Fallback to sample news if no cache and API fails
-                    setNews([
-                        {
-                            title: "Error fetching live news",
-                            date: "Now",
-                            category: "System",
-                            description: "Please check your API key and connection. Displaying sample news as fallback.",
-                            url: "#"
-                        }
-                    ]);
-                }
-            }
-        };
-
-        fetchAndCacheNews();
-
-        // Set up periodic check for cache age
-        const checkCacheInterval = setInterval(() => {
-            const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
-            const now = new Date().getTime();
-
-            if (cachedTimestamp) {
-                const timeDiff = now - parseInt(cachedTimestamp);
-                const hoursElapsed = timeDiff / (1000 * 60 * 60);
-
-                // If cache is more than 24 hours old, fetch new data
-                if (hoursElapsed >= 24) {
-                    fetchAndCacheNews();
-                }
-            }
-        }, 1000 * 60 * 60); // Check every hour
-
-        // Also check when tab becomes visible
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                const cachedTimestamp = localStorage.getItem('techNewsCacheTimestamp');
-                const now = new Date().getTime();
-
-                if (cachedTimestamp) {
-                    const timeDiff = now - parseInt(cachedTimestamp);
-                    const hoursElapsed = timeDiff / (1000 * 60 * 60);
-
-                    if (hoursElapsed >= 24) {
-                        fetchAndCacheNews();
-                    }
-                }
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        // Cleanup
-        return () => {
-            clearInterval(checkCacheInterval);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (news.length === 0) return;
-
-        const timer = setInterval(() => {
-            setActiveIndex((current) => (current + 1) % news.length);
-        }, 5000);
-
-        return () => clearInterval(timer);
-    }, [news.length]);
-
-    const handleReadMore = (url) => {
-        window.open(url, '_blank');
-    };
-
-    if (loading) {
-        return (
-            <Card className="p-6 bg-gray-900/50 backdrop-blur border-cyan-500/20">
-                <div className="flex items-center justify-center h-48">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
-                </div>
-            </Card>
-        );
-    }
-
-    return (
-        <Card className="p-6 bg-gray-900/50 backdrop-blur border-cyan-500/20">
-            <h3 className="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
-                <Newspaper className="w-5 h-5" />
-                Tech News Feed
-            </h3>
-            <div className="relative overflow-hidden h-48">
-                {news.map((item, index) => (
-                    <div
-                        key={index}
-                        className={`absolute inset-0 transform transition-all duration-500 ${index === activeIndex
-                            ? 'translate-x-0 opacity-100'
-                            : 'translate-x-full opacity-0'
-                            }`}
-                    >
-                        <span className="bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded text-sm">
-                            {item.category}
-                        </span>
-                        <h4 className="text-lg font-semibold text-white mt-2 mb-1">{item.title}</h4>
-                        <p className="text-gray-400 text-sm mb-2">{item.date}</p>
-                        <p className="text-gray-300 line-clamp-2">{item.description}</p>
-                        <button
-                            onClick={() => handleReadMore(item.url)}
-                            className="mt-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
-                        >
-                            Read More <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </div>
-                ))}
-            </div>
-            <div className="flex justify-center gap-2 mt-4">
-                {news.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setActiveIndex(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === activeIndex
-                            ? 'bg-cyan-400 w-4'
-                            : 'bg-gray-600 hover:bg-gray-500'
-                            }`}
-                    />
-                ))}
-            </div>
-        </Card>
-    );
-};
-
-const ParticleEffect = () => {
-    const canvasRef = useRef(null);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        const particles = [];
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.speed = 0.5;
-                this.size = Math.random() * 2;
-            }
-
-            update() {
-                this.y -= this.speed;
-                if (this.y < 0) {
-                    this.y = canvas.height;
-                    this.x = Math.random() * canvas.width;
-                }
-            }
-
-            draw() {
-                ctx.fillStyle = "rgba(103, 232, 249, 0.5)";
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 100; i++) {
-            particles.push(new Particle());
-        }
-
-        const animate = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((particle) => {
-                particle.update();
-                particle.draw();
-            });
-            requestAnimationFrame(animate);
-        };
-
-        animate();
-    }, []);
-
-    return (
-        <canvas
-            ref={canvasRef}
-            className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
-        />
-    );
-};
+// Helper function
+import { generateCalendarUrl } from '../utils/helpers';
 
 // Stats component for HomePage
 const StatsCounter = ({ label, endValue, duration = 2000 }) => {
@@ -2221,204 +1952,48 @@ const ContactPage = () => {
 };
 const WebsitePreview = () => {
     const [currentPage, setCurrentPage] = useState("Home");
-    const [isOpen, setIsOpen] = useState(false);
 
-    // include SOC in your nav items
-    const navItems = ["Home", "Events", "Resources", "Team", "Contact", "SOC"];
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (isOpen) {
-                setIsOpen(false);
-            }
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [isOpen]);
-
-    const handleNavClick = (item) => {
-        if (item === "SOC") {
-            // open SOC site in new tab
-            window.open("https://wncc-soc.tech-iitb.org/", "_blank", "noopener");
-            setIsOpen(false);
-        } else {
-            setCurrentPage(item);
-            setIsOpen(false);
+    // Get the appropriate page component based on current selection
+    const getPageComponent = () => {
+        switch(currentPage) {
+            case "Home":
+                return WebsitePreviewComponents["Home"] || <HomePage />;
+            case "Events":
+                return <EventsPage />;
+            case "Resources":
+                return <ResourcesPage />;
+            case "Team":
+                return <TeamPage />;
+            case "Contact":
+                return <ContactPage />;
+            case "Hello FOSS":
+                return <HelloFOSS />;
+            case "About":
+                // We'll use HomePage's AboutUs section for now
+                return <div className="py-12"><AboutUs /></div>;
+            case "Blogs":
+                // Placeholder for Blogs page
+                return (
+                    <div className="text-center py-20">
+                        <h2 className="text-4xl font-bold text-cyan-400 mb-6">Coming Soon</h2>
+                        <p className="text-xl text-gray-300">Our blog section is under development.</p>
+                    </div>
+                );
+            default:
+                return WebsitePreviewComponents["Home"] || <HomePage />;
         }
     };
 
-    const PageComponent = {
-        Home: HomePage,
-        Events: EventsPage,
-        Resources: ResourcesPage,
-        Team: TeamPage,
-        Contact: ContactPage,
-    }[currentPage];
-
-    const quickLinks = [
-        { title: "Contact Us", url: "" },
-        { title: "Projects", url: "https://github.com/orgs/wncc/repositories" },
-        { title: "Blog", url: "https://www.technewsworld.com/section/tech-blog" },
-    ];
-
     return (
-        <div className="min-h-screen bg-gray-900 text-white">
-            <nav className="bg-gray-900/50 backdrop-blur-lg border-b border-cyan-500/20 p-4 sticky top-0 z-50">
-                <div className="container mx-auto flex justify-between items-center">
-                    <div className="text-cyan-400">
-                        <img
-                            src="/Images/Logo.png"
-                            alt="WnCC IITB Logo"
-                            className="h-8 w-auto"
-                        />
-                    </div>
-
-                    {/* Hamburger menu button */}
-                    <div className="md:hidden">
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="text-cyan-400 focus:outline-none"
-                        >
-                            <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d={
-                                        isOpen
-                                            ? "M6 18L18 6M6 6l12 12"
-                                            : "M4 6h16M4 12h16m-7 6h7"
-                                    }
-                                />
-                            </svg>
-                        </button>
-                    </div>
-
-                    {/* Desktop Navbar */}
-                    <div className="hidden md:flex gap-6">
-                        {navItems.map((item) => (
-                            <button
-                                key={item}
-                                onClick={() => handleNavClick(item)}
-                                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${currentPage === item
-                                    ? "bg-cyan-500/20 text-cyan-400"
-                                    : "text-gray-300 hover:text-cyan-400"
-                                    }`}
-                            >
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Mobile Navbar (Hamburger Menu) */}
-                {isOpen && (
-                    <div className="absolute bg-gray-800/90 w-full left-0 top-full flex flex-col gap-4 p-4 border-t border-cyan-500/20">
-                        {navItems.map((item) => (
-                            <button
-                                key={item}
-                                onClick={() => handleNavClick(item)}
-                                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${currentPage === item
-                                    ? "bg-cyan-500/20 text-cyan-400"
-                                    : "text-gray-300 hover:text-cyan-400"
-                                    }`}
-                            >
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </nav>
-
+        <div className="min-h-screen bg-gray-950 text-white relative">
+            <ParticleEffect />
+            <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            
             <main className="container mx-auto px-4 py-8">
-                <PageComponent />
+                {getPageComponent()}
             </main>
-
-            <footer className="bg-gray-900/50 backdrop-blur-lg border-t border-cyan-500/20 p-8 mt-16">
-                <div className="container mx-auto grid md:grid-cols-4 gap-8">
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="text-xl font-bold text-cyan-400 mb-4">
-                            Quick Links
-                        </h3>
-                        <ul className="space-y-2">
-                            {quickLinks.map((link, i) => (
-                                <li key={i}>
-                                    <a
-                                        href={link.url}
-                                        className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                                    >
-                                        {link.title}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Contact Info */}
-                    <div>
-                        <h3 className="text-xl font-bold text-cyan-400 mb-4">
-                            Contact
-                        </h3>
-                        <ul className="space-y-2 text-gray-400">
-                            <li>wncc@iitb.ac.in</li>
-                            <li>Student Activity Center</li>
-                            <li>IIT Bombay, Powai</li>
-                            <li>Mumbai - 400076</li>
-                        </ul>
-                    </div>
-
-                    {/* Social Links */}
-                    <div>
-                        <h3 className="text-xl font-bold text-cyan-400 mb-4">
-                            Connect
-                        </h3>
-                        <div className="flex gap-4">
-                            <a
-                                href="https://github.com/wncc"
-                                className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                            >
-                                <Github className="w-6 h-6" />
-                            </a>
-                            <a
-                                href="https://x.com/i/flow/login?redirect_after_login=%2Fwncc_iitb"
-                                className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                            >
-                                <Twitter className="w-6 h-6" />
-                            </a>
-                            <a
-                                href="https://www.linkedin.com/company/wncc-iitb/posts/?feedView=all"
-                                className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                            >
-                                <Linkedin className="w-6 h-6" />
-                            </a>
-                            <a
-                                href="https://www.instagram.com/wncc.iitb/"
-                                className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                            >
-                                <Instagram className="w-6 h-6" />
-                            </a>
-                            <a
-                                href="https://linktr.ee/wncciitb"
-                                className="text-gray-400 hover:text-cyan-400 transition-colors duration-300"
-                            >
-                                <Link className="w-6 h-6" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="container mx-auto mt-8 pt-8 border-t border-cyan-500/20 text-center">
-                    <p className="text-gray-400">
-                        © 2024 Web and Coding Club, IIT Bombay. All rights reserved.
-                    </p>
-                </div>
-            </footer>
+            
+            <Footer />
         </div>
     );
 };
