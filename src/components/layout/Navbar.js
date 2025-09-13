@@ -5,7 +5,8 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Add "Hello FOSS" to the navItems array
-    const navItems = ["Home", "About", "Events", "Resources", "Blogs", "Team", "Contact", "Hello FOSS"];
+    // const navItems = ["Home", "About", "Events", "Resources", "Blogs", "Team", "Contact", "Hello FOSS"];
+    const navItems = ["Home", "Events", "Resources", "Team", "Contact", "Hello FOSS"];
 
     const handleNavClick = (page) => {
         setCurrentPage(page);
@@ -16,7 +17,7 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
         <nav className="sticky top-0 bg-gray-900/80 backdrop-blur-lg border-b border-cyan-500/20 px-4 py-4 z-50">
             <div className="container mx-auto flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    <img src="/WnCC.png" alt="WnCC Logo" className="w-8 h-8" />
+                    <img src="/Images/logo.png" alt="WnCC Logo" className="h-8" />
                     <div className="flex flex-col">
                         <span className="text-lg font-bold text-cyan-400">Web & Coding Club</span>
                         <span className="text-xs text-gray-500">IIT Bombay</span>
